@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratorio de números · 0–9999 · v0.4</title>
+<style>
+:root{
+  --bg:#fffaf1;--panel:#fff;--ink:#263238;--muted:#66777e;--line:#d8e2e5;
+  --u:#ffd166;--u2:#a96f00;--d:#8ecae6;--d2:#17627f;--c:#9bd18b;--c2:#397344;
+  --m:#c7a6e8;--m2:#69488b;--accent:#506f54;--good:#26734d;--bad:#b33a3a;
+  --shadow:0 8px 24px rgba(38,50,56,.10);--radius:22px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer;touch-action:manipulation}
+.app{width:min(1240px,100%);margin:auto;padding:16px}
+header{display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:center;margin-bottom:14px}
+h1{font-size:clamp(1.45rem,3vw,2.15rem);margin:0}.subtitle{color:var(--muted);font-weight:700;margin:4px 0 0}
+.ranges,.langs,.tabs,.row,.choices,.subtabs,.series-steps{display:flex;gap:8px;flex-wrap:wrap}
+.ranges button,.langs button,.tabs button,.subtabs button,.series-steps button,.toolbar button{min-height:46px;border:2px solid var(--line);border-radius:15px;background:#fff;padding:8px 12px;font-weight:850}
+.ranges button[aria-pressed="true"],.langs button[aria-pressed="true"],.tabs button[aria-selected="true"],.subtabs button[aria-pressed="true"],.series-steps button[aria-pressed="true"]{background:#263238;color:#fff;border-color:#263238}
+.header-tools{display:flex;gap:8px;align-items:center}.header-tools button{min-height:46px;border:2px solid var(--line);background:#fff;border-radius:15px;padding:8px 12px;font-weight:850}
+.tabs{margin:12px 0 14px}.tabs button{flex:1;min-width:130px}.mode{display:none}.mode.active{display:block}
+.mascot{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:18px;padding:10px 14px;margin-bottom:14px;box-shadow:var(--shadow)}
+.owl{font-size:2.2rem}.mascot p{margin:0;font-weight:800}.mascot button{min-height:44px;border:2px solid var(--line);border-radius:14px;background:#fff}
+.grid{display:grid;grid-template-columns:minmax(300px,.82fr) minmax(420px,1.55fr);gap:16px}.panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+h2{margin:0 0 12px}.big-number{text-align:center;font-size:clamp(4.5rem,12vw,8rem);font-weight:950;line-height:.95;letter-spacing:-.06em}.number-word{text-align:center;font-size:clamp(1.35rem,4vw,2.35rem);font-weight:850;color:var(--accent);margin-top:8px}.expanded{text-align:center;font-size:1.25rem;font-weight:850;margin:12px 0;color:#44575f}
+.field{margin-top:15px}.field label{display:block;font-weight:850;margin-bottom:7px}.field input,.field select{width:100%;min-height:50px;border:2px solid var(--line);border-radius:14px;padding:8px 12px;background:#fff;font-size:1.08rem}.inline{display:grid;grid-template-columns:1fr auto;gap:8px}.inline button,.primary-btn,.secondary-btn{min-height:50px;border-radius:14px;border:2px solid var(--line);padding:8px 14px;font-weight:900}.primary-btn{background:var(--accent);color:#fff;border-color:var(--accent)}.secondary-btn{background:#fff}
+.nav-steps{display:grid;gap:9px;margin-top:14px}.nav-step-row{display:grid;grid-template-columns:74px minmax(0,1fr);gap:8px;align-items:center}.nav-step-label{font-size:.86rem;font-weight:900;color:var(--muted);text-align:right}.nav-step-buttons{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:7px;min-width:0}.nav-step-buttons button{min-width:0;min-height:46px;border:2px solid var(--line);border-radius:13px;background:#f8faf9;font-weight:900;padding:6px 8px}.nav-step-buttons.add button{background:#eef8f1;border-color:#b8d9c2}.nav-step-buttons.subtract button{background:#fff4ef;border-color:#e9c4b6}.nav-step-buttons button:disabled{opacity:.28;cursor:not-allowed}
+.place-table{width:100%;border-collapse:separate;border-spacing:7px}.place-table th,.place-table td{text-align:center;border-radius:14px;padding:10px}.place-table th{color:#fff;font-size:.9rem}.place-table td{font-size:2rem;font-weight:950;border:2px solid transparent}.pv-um{background:var(--m);border-color:var(--m2)!important}.pv-c{background:var(--c);border-color:var(--c2)!important}.pv-d{background:var(--d);border-color:var(--d2)!important}.pv-u{background:var(--u);border-color:var(--u2)!important}.place-table th.pv-um{background:var(--m2)}.place-table th.pv-c{background:var(--c2)}.place-table th.pv-d{background:var(--d2)}.place-table th.pv-u{background:var(--u2)}.place-table td.pv-focus{outline:5px solid #ff8a3d;outline-offset:3px;box-shadow:0 0 0 8px rgba(255,138,61,.18);transform:scale(1.08);position:relative;z-index:2}
+.view-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.view-tabs button{min-height:44px;border:2px solid var(--line);border-radius:14px;background:#fff;font-weight:850;padding:7px 11px}.view-tabs button[aria-pressed="true"]{background:#263238;color:#fff}
+.visual{min-height:265px;border-radius:18px;background:#f8fbfb;border:1px solid var(--line);padding:14px;display:flex;align-items:center;justify-content:center;overflow:auto}.base10{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;justify-content:center}.block-column{text-align:center;min-width:82px}.block-column strong{display:block;margin-bottom:8px}.blocks{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;align-items:flex-end}.unit-block{width:25px;height:25px;border-radius:7px;background:var(--u);border:2px solid var(--u2)}.ten-block{width:17px;height:92px;border-radius:6px;background:repeating-linear-gradient(to bottom,var(--d),var(--d) 7px,#fff 7px,#fff 8px);border:2px solid var(--d2)}.hundred-block{width:72px;height:72px;border-radius:9px;background:repeating-linear-gradient(0deg,transparent,transparent 6px,rgba(255,255,255,.8) 6px,rgba(255,255,255,.8) 7px),repeating-linear-gradient(90deg,var(--c),var(--c) 6px,rgba(255,255,255,.8) 6px,rgba(255,255,255,.8) 7px);border:2px solid var(--c2)}.thousand-block{width:82px;height:82px;border-radius:12px;background:linear-gradient(135deg,var(--m),#dec8f2);border:4px solid var(--m2);box-shadow:inset -10px -10px 0 rgba(105,72,139,.18)}
+.abacus{display:flex;align-items:flex-end;gap:20px;min-height:225px}.rod-wrap{text-align:center}.rod{width:42px;height:175px;border:3px solid #7d684e;border-top:0;border-radius:0 0 14px 14px;display:flex;flex-direction:column-reverse;align-items:center;padding:7px 0;gap:3px;background:linear-gradient(90deg,#f5eadb 47%,#b38c61 48%,#b38c61 52%,#f5eadb 53%)}.bead{width:32px;height:12px;border-radius:9px;border:2px solid rgba(0,0,0,.25)}.bead.um{background:var(--m)}.bead.c{background:var(--c)}.bead.d{background:var(--d)}.bead.u{background:var(--u)}.rod-label{font-weight:900;margin-top:5px}
+.series-box{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}.series-output{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.series-chip{padding:8px 11px;border-radius:12px;background:#edf5f6;border:2px solid #bfd5da;font-weight:900}
+.status{min-height:52px;margin-top:12px;border-radius:15px;background:#f4f7f7;padding:11px 13px;font-weight:800;display:flex;align-items:center}.status.good{background:#edf8f1;color:var(--good)}.status.bad{background:#fff0f0;color:var(--bad)}
+.builder-target{text-align:center;font-size:2.5rem;font-weight:950;margin:10px}.builder-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:12px 0}.builder-buttons button,.exchange-grid button{min-height:56px;border:3px solid var(--line);border-radius:16px;background:#fff;font-weight:900}.builder-buttons button[data-place="1000"]{border-color:var(--m2);background:#f5ecfc}.builder-buttons button[data-place="100"]{border-color:var(--c2);background:#eef8eb}.builder-buttons button[data-place="10"]{border-color:var(--d2);background:#ebf7fc}.builder-buttons button[data-place="1"]{border-color:var(--u2);background:#fff8dc}.builder-readout{text-align:center;font-size:1.25rem;font-weight:850;margin:10px}.builder-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.exchange-guide{max-width:850px;margin:0 auto 14px;padding:13px 15px;border-radius:16px;background:#f3f8fb;border:2px solid #c9dfe8;font-weight:800;line-height:1.45}.exchange-total{text-align:center;font-size:1.2rem;font-weight:950;margin:10px 0 14px}.exchange-houses{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}.exchange-house{border:3px solid var(--line);border-radius:18px;padding:12px;text-align:center;background:#fff;min-height:145px}.exchange-house .house-name{font-weight:900;margin-bottom:4px}.exchange-house .house-count{font-size:2.25rem;font-weight:950;line-height:1}.exchange-pieces{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:11px}.exchange-piece{width:28px;height:28px;min-height:28px;padding:0;border-radius:8px;border:2px solid rgba(0,0,0,.28);box-shadow:none;transition:transform .12s ease,outline .12s ease,filter .12s ease}.exchange-piece:hover{transform:scale(1.08)}.exchange-piece.selected{outline:4px solid var(--focus);outline-offset:2px;transform:scale(1.12);filter:saturate(1.15)}.exchange-house.pv-um .exchange-piece{background:var(--m)}.exchange-house.pv-c .exchange-piece{background:var(--c)}.exchange-house.pv-d .exchange-piece{background:var(--d)}.exchange-house.pv-u .exchange-piece{background:var(--u)}.exchange-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin:15px 0}.exchange-action{min-height:60px;border:3px solid var(--accent);border-radius:17px;background:#edf8f1;color:#204d32;font-size:1.08rem;font-weight:950;padding:10px 18px}.exchange-action:disabled{opacity:.38;cursor:not-allowed}.exchange-selection{text-align:center;font-weight:900;color:var(--accent);min-height:28px;margin-top:6px}
+.question{font-size:clamp(1.3rem,3vw,2rem);font-weight:900;text-align:center;margin:14px auto;max-width:850px}.choices{justify-content:center}.choices button{min-width:120px;min-height:60px;border:3px solid var(--line);border-radius:16px;background:#fff;font-size:1.25rem;font-weight:950;padding:10px 16px}.choices button:hover{transform:translateY(-2px)}
+.compose-card{max-width:760px;margin:auto;text-align:center}.compose-expression{font-size:clamp(1.8rem,5vw,3.4rem);font-weight:950;margin:20px 0}.answer-box{display:grid;grid-template-columns:1fr auto;gap:8px;max-width:520px;margin:auto}.answer-box input{min-height:58px;border:3px solid var(--line);border-radius:16px;padding:8px 14px;font-size:1.4rem;font-weight:850}.answer-box button{border:0;border-radius:16px;background:var(--accent);color:#fff;font-weight:900;padding:0 18px}
+.order-cards{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:18px 0}.order-card{min-width:120px;min-height:70px;border:3px solid #78909c;border-radius:17px;background:#fff;font-size:1.55rem;font-weight:950}.order-card.selected{background:#dff3e5;border-color:var(--good)}.order-result{min-height:64px;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}.order-picked{padding:9px 13px;border-radius:13px;background:#eef5f6;font-weight:950}
+.flash{font-size:clamp(3.5rem,12vw,7rem);font-weight:950;text-align:center;padding:28px}.higher-box{max-width:520px;margin:auto}.higher-box input{width:100%;min-height:58px;border:3px solid var(--line);border-radius:16px;padding:8px 14px;font-size:1.4rem;font-weight:900;text-align:center}
+.game-panel{padding:16px}.game-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}.game-config{display:flex;gap:8px;flex-wrap:wrap}.game-config button,.game-controls button{min-height:44px;border:2px solid var(--line);border-radius:14px;background:#fff;font-weight:850;padding:7px 10px}.game-config button[aria-pressed="true"]{background:#263238;color:#fff}.game-prompt{text-align:center;font-size:clamp(1.5rem,4vw,2.5rem);font-weight:950;background:#fff4c7;border:3px solid #e2b52d;border-radius:18px;padding:10px;margin:10px 0}.game-hud{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px}.game-stat{background:#f5f8f8;border-radius:13px;padding:8px;text-align:center}.game-stat span{display:block;font-size:.78rem;color:var(--muted);font-weight:800}.game-stat strong{font-size:1.2rem}.game-scene{position:relative;height:245px;overflow:hidden;border:2px solid #b9dce8;border-radius:20px;background:linear-gradient(#cceefa 0 55%,#b9dc91 55% 100%)}.game-lane{position:absolute;left:0;right:0;height:130px}.game-path{position:absolute;left:0;right:205px;bottom:18px;height:72px;background:#dfc08c;border-top:5px solid #aa8450;border-bottom:5px solid #aa8450}.game-pool{position:absolute;right:8px;bottom:0;width:175px;height:80px;border:7px solid #e8eef0;border-radius:44% 44% 28px 28px;background:repeating-radial-gradient(ellipse at 20% 20%,#c8f4ff 0 8px,#77d8ee 9px 18px);box-shadow:0 5px 0 #95a4aa}.game-trampoline{position:absolute;right:150px;bottom:47px;width:90px;height:14px;border-radius:12px;background:#5f6d73;border:3px solid #263238;transform:rotate(-5deg);z-index:3}.runner{position:absolute;left:0;bottom:26px;width:82px;height:90px;border:0;background:transparent;padding:0;z-index:5;will-change:transform}.runner-card{width:76px;min-height:82px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:20px;background:#fff;border:3px solid #536269;box-shadow:0 5px 12px rgba(0,0,0,.16);pointer-events:none}.runner-face{font-size:1.8rem;line-height:1}.runner-num{display:grid;place-items:center;min-width:54px;height:32px;padding:0 5px;border-radius:11px;background:#fff2bd;border:2px solid var(--u2);font-size:1.2rem;font-weight:950}.runner.shake .runner-card{animation:shake .3s}.runner.correct .runner-card{animation:happy .7s forwards}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-5px)}}@keyframes happy{35%{transform:translateY(-45px) scale(1.12)}100%{transform:translateY(0) scale(.7);opacity:0}}.game-controls{display:flex;gap:8px;justify-content:center;margin-top:10px}.game-rewards{text-align:center;font-size:1.4rem;min-height:36px;margin:5px}
+@media(max-width:900px){header{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.builder-buttons{grid-template-columns:repeat(2,1fr)}.game-hud{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.app{padding:9px}.tabs button{min-width:105px}.nav-step-row{grid-template-columns:1fr}.nav-step-label{text-align:left}.nav-step-buttons{grid-template-columns:repeat(2,minmax(0,1fr))}.game-scene{height:330px}.game-hud{grid-template-columns:repeat(2,1fr)}.ranges button{flex:1}.header-tools{flex-wrap:wrap}.runner{width:70px}.runner-card{width:66px}.runner-num{min-width:47px;font-size:1rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.runner-card{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div><h1 id="appTitle">🔢 Laboratorio de los números</h1><p class="subtitle" id="appSubtitle">Comprende el sistema decimal hasta 9.999</p></div>
+  <div class="ranges" id="ranges" role="group" aria-label="Rango"><button data-max="99" aria-pressed="true">0–99</button><button data-max="999" aria-pressed="false">0–999</button><button data-max="9999" aria-pressed="false">0–9999</button></div>
+  <div class="header-tools"><button id="soundBtn">🔊 Sonido</button><div class="langs" id="langs"><button data-lang="es" aria-pressed="true">ES</button><button data-lang="va" aria-pressed="false">VA</button><button data-lang="en" aria-pressed="false">EN</button></div></div>
+</header>
+
+<nav class="tabs" id="tabs" role="tablist">
+  <button data-mode="explore" aria-selected="true">🔍 Explora</button>
+  <button data-mode="build" aria-selected="false">🧱 Construye</button>
+  <button data-mode="exchange" aria-selected="false">🔄 Canjes</button>
+  <button data-mode="place" aria-selected="false">🏠 Valor posicional</button>
+  <button data-mode="compose" aria-selected="false">🧩 Compón</button>
+  <button data-mode="order" aria-selected="false">↕️ Ordena</button>
+  <button data-mode="discover" aria-selected="false">🦉 Descubre</button>
+  <button data-mode="game" aria-selected="false">🏊 Juego</button>
+</nav>
+
+<div class="mascot"><span class="owl">🦉</span><p id="say" aria-live="polite">Elige un modo para empezar.</p><button id="repeatBtn" aria-label="Repetir">🔊</button></div>
+
+<main>
+<section id="exploreMode" class="mode active">
+  <div class="grid">
+    <section class="panel">
+      <div id="bigNumber" class="big-number">47</div>
+      <div id="numberWord" class="number-word">cuarenta y siete</div>
+      <div id="expanded" class="expanded">40 + 7</div>
+      <div id="navSteps" class="nav-steps"></div>
+      <div class="field"><label id="numberInputLabel" for="numberInput">Escribe un número</label><div class="inline"><input id="numberInput" type="number" min="0" max="99" value="47"><button id="showNumber" class="primary-btn">Mostrar</button></div></div>
+      <div class="row" style="margin-top:10px"><button id="randomNumber" class="secondary-btn">🎲 Otro</button><button id="speakNumber" class="secondary-btn">🔊 Escuchar</button></div>
+    </section>
+    <section class="panel">
+      <div class="view-tabs" id="exploreViews"><button data-view="table" aria-pressed="true">🏠 Tabla</button><button data-view="blocks" aria-pressed="false">🧱 Base 10</button><button data-view="abacus" aria-pressed="false">🧮 Ábaco</button></div>
+      <div id="exploreVisual" class="visual"></div>
+      <div id="exploreStatus" class="status">Observa cómo cambia cada cifra según su posición.</div>
+    </section>
+  </div>
+</section>
+
+<section id="buildMode" class="mode"><section class="panel">
+  <h2 id="buildTitle">Construye el número</h2><div id="buildTarget" class="builder-target"></div>
+  <div id="buildVisual" class="visual"></div><div id="buildReadout" class="builder-readout"></div>
+  <div id="builderButtons" class="builder-buttons"></div>
+  <div class="builder-actions"><button id="buildUndo" class="secondary-btn">↩ Quitar último</button><button id="buildReset" class="secondary-btn">↺ Vaciar</button><button id="buildCheck" class="primary-btn">✔ Comprobar</button></div>
+  <div id="buildStatus" class="status"></div>
+</section></section>
+
+<section id="exchangeMode" class="mode"><section class="panel">
+  <h2 id="exchangeTitle">Canjes del sistema decimal</h2>
+  <div id="exchangeGuide" class="exchange-guide"></div>
+  <div id="exchangeTotal" class="exchange-total"></div>
+  <div id="exchangeCounters" class="exchange-houses"></div>
+  <div id="exchangeSelection" class="exchange-selection" aria-live="polite"></div>
+  <div id="exchangeButtons" class="exchange-actions"></div>
+  <div class="row" style="justify-content:center;margin-top:12px"><button id="exchangeNew" class="secondary-btn">🎲 Nuevo reto</button></div>
+  <div id="exchangeStatus" class="status"></div>
+</section></section>
+
+<section id="placeMode" class="mode"><section class="panel">
+  <h2 id="placeTitle">Valor posicional</h2><div id="placeQuestion" class="question"></div><div id="placeVisual" class="visual" style="min-height:150px"></div><div id="placeChoices" class="choices" style="margin-top:14px"></div><div id="placeStatus" class="status"></div>
+</section></section>
+
+<section id="composeMode" class="mode"><section class="panel compose-card">
+  <h2 id="composeTitle">Compón y descompón</h2><div class="subtabs" id="composeTabs" style="justify-content:center"><button data-compose="compose" aria-pressed="true">Compón</button><button data-compose="decompose" aria-pressed="false">Descompón</button></div>
+  <div id="composePrompt" class="question"></div><div id="composeExpression" class="compose-expression"></div>
+  <div class="answer-box"><input id="composeAnswer" inputmode="numeric" autocomplete="off"><button id="composeCheck">✔</button></div>
+  <div class="row" style="justify-content:center;margin-top:12px"><button id="composeNew" class="secondary-btn">🎲 Otro reto</button></div><div id="composeStatus" class="status"></div>
+</section></section>
+
+<section id="orderMode" class="mode"><section class="panel">
+  <h2 id="orderTitle">Ordena los números</h2><p id="orderPrompt" class="question">Pulsa de menor a mayor.</p><div id="orderCards" class="order-cards"></div><div id="orderResult" class="order-result"></div><div class="row" style="justify-content:center"><button id="orderReset" class="secondary-btn">↺ Reiniciar</button><button id="orderCheck" class="primary-btn">✔ Comprobar</button><button id="orderNew" class="secondary-btn">🎲 Nuevos</button></div><div id="orderStatus" class="status"></div>
+</section></section>
+
+<section id="discoverMode" class="mode"><section class="panel">
+  <h2 id="discoverTitle">Descubre el número</h2><div class="subtabs" id="discoverTabs"><button data-discover="hear" aria-pressed="true">👂 Lo oigo</button><button data-discover="see" aria-pressed="false">👀 Lo veo</button><button data-discover="higher" aria-pressed="false">🔎 Más o menos</button></div>
+  <div id="discoverArea" class="visual" style="margin-top:14px"></div><div id="discoverChoices" class="choices" style="margin-top:14px"></div><div id="higherBox" class="higher-box" hidden><div class="inline"><input id="higherInput" type="number" min="0"><button id="higherTry" class="primary-btn">Probar</button></div></div><div id="discoverStatus" class="status"></div>
+</section></section>
+
+<section id="gameMode" class="mode"><section class="panel game-panel">
+  <div class="game-top"><div><h2 id="gameTitle">Camino a la piscina</h2><p id="gameIntro" class="subtitle">Encuentra el número que pide la mascota.</p></div><div class="game-config"><div id="gameSpeed"><button data-speed="slow" aria-pressed="false">Despacio</button><button data-speed="normal" aria-pressed="true">Normal</button><button data-speed="fast" aria-pressed="false">Rápido</button></div><div id="gameDifficulty"><button data-diff="1" aria-pressed="true">1 camino</button><button data-diff="2" aria-pressed="false">2 caminos</button><button data-diff="3" aria-pressed="false">3 caminos</button></div></div></div>
+  <div id="gamePrompt" class="game-prompt">Pulsa Iniciar</div>
+  <div class="game-hud"><div class="game-stat"><span id="pointsLabel">Puntos</span><strong id="gameScore">0</strong></div><div class="game-stat"><span id="rangeLabel">Rango</span><strong id="gameRange">0–99</strong></div><div class="game-stat"><span id="accuracyLabel">Precisión</span><strong id="gameAccuracy">—</strong></div><div class="game-stat"><span id="rewardLabel">Recompensas</span><strong id="gameRewards">—</strong></div></div>
+  <div id="gameScene" class="game-scene"></div>
+  <div class="game-controls"><button id="gameStart">▶ Iniciar</button><button id="gamePause">⏸ Pausa</button><button id="gameEnd">■ Terminar</button></div><div id="gameStatus" class="status"></div>
+</section></section>
+</main>
+</div>
+<script>
+(()=>{
+"use strict";
+const $=id=>document.getElementById(id), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a, clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+const state={max:99,number:47,lang:"es",sound:true,mode:"explore",view:"table",seriesStep:10};
+const POS=[{key:"um",value:1000,es:"UM",va:"UM",en:"Th",cls:"pv-um"},{key:"c",value:100,es:"C",va:"C",en:"H",cls:"pv-c"},{key:"d",value:10,es:"D",va:"D",en:"T",cls:"pv-d"},{key:"u",value:1,es:"U",va:"U",en:"O",cls:"pv-u"}];
+const TX={
+ es:{title:"🔢 Laboratorio de los números",sub:"Comprende el sistema decimal hasta 9.999",ready:"Elige un modo para empezar.",show:"Mostrar",other:"🎲 Otro",listen:"🔊 Escuchar",series:"Series",observe:"Observa cómo cambia cada cifra según su posición.",build:"Construye el número",remove:"↩ Quitar último",empty:"↺ Vaciar",check:"✔ Comprobar",buildAsk:"Construye {n}.",correct:"¡Muy bien!",wrong:"Revisa la cantidad.",youHave:"Llevas {n}",exchange:"Canjes del sistema decimal",exchangePrompt:"Busca una casa con 10 o más piezas. Selecciona exactamente 10 piezas de esa misma casa y después haz el canje. Observa qué ocurre en la casa de la izquierda.",exchangeTotal:"El valor total es {n}. Debe seguir siendo el mismo después del canje.",exchangeAction:"🔄 Canjear las 10 seleccionadas",exchangeDone:"¡Eso es! 10 {low} se han convertido en 1 {high}. El valor sigue siendo {total}.",exchangeExplain:"10 {low} = 1 {high}.",exchangeSelected:"Seleccionadas: {n}/10",exchangeReady:"Ya tienes 10 piezas. Ahora haz el canje.",exchangeSameHouse:"Las 10 piezas deben ser de la misma casa. Desmarca la selección actual antes de elegir otra casa.",exchangeNeedTen:"Selecciona exactamente 10 piezas de una misma casa antes de hacer el canje.",exchangeNoHigher:"Desde esa casa no puedes hacer un canje hacia la izquierda.",newChallenge:"🎲 Nuevo reto",place:"Valor posicional",compose:"Compón y descompón",order:"Ordena los números",orderPrompt:"Pulsa de menor a mayor.",discover:"Descubre el número",hear:"👂 Lo oigo",see:"👀 Lo veo",higher:"🔎 Más o menos",try:"Probar",game:"Camino a la piscina",gameIntro:"Encuentra el número que pide la mascota.",points:"Puntos",range:"Rango",accuracy:"Precisión",rewards:"Recompensas",start:"▶ Iniciar",pause:"⏸ Pausa",resume:"▶ Reanudar",end:"■ Terminar",find:"Busca {n}.",miss:"Se ha tirado a la piscina. Vamos con otro.",gameOver:"Partida terminada. {n} puntos.",more:"Es mayor.",less:"Es menor.",found:"¡Lo has encontrado!",composeAsk:"¿Qué número forman estas cantidades?",decomposeAsk:"Escribe la descomposición aditiva de {n}.",positionQ:"En {n}, ¿qué cifra ocupa las {p}?",valueQ:"En {n}, ¿cuánto vale la cifra destacada?",nameQ:"En {n}, ¿qué posición ocupa la cifra destacada?",unit:"unidades",ten:"decenas",hundred:"centenas",thousand:"unidades de millar",normalize:"Busca la casa que tiene 10 o más piezas y haz el canje.",noExchange:"Ese canje no es posible ahora.",higherStart:"Estoy pensando un número entre 0 y {max}.",hearAsk:"¿Qué número has oído?",seeAsk:"¿Qué número has visto?"},
+ va:{title:"🔢 Laboratori dels nombres",sub:"Comprén el sistema decimal fins a 9.999",ready:"Tria un mode per a començar.",show:"Mostrar",other:"🎲 Un altre",listen:"🔊 Escoltar",series:"Sèries",observe:"Observa com canvia cada xifra segons la seua posició.",build:"Construeix el nombre",remove:"↩ Llevar l'últim",empty:"↺ Buidar",check:"✔ Comprovar",buildAsk:"Construeix {n}.",correct:"Molt bé!",wrong:"Revisa la quantitat.",youHave:"Portes {n}",exchange:"Canvis del sistema decimal",exchangePrompt:"Busca una casa amb 10 o més peces. Selecciona exactament 10 peces d’eixa mateixa casa i després fes el canvi. Observa què passa a la casa de l’esquerra.",exchangeTotal:"El valor total és {n}. Ha de continuar sent el mateix després del canvi.",exchangeAction:"🔄 Canviar les 10 seleccionades",exchangeDone:"Això és! 10 {low} s’han convertit en 1 {high}. El valor continua sent {total}.",exchangeExplain:"10 {low} = 1 {high}.",exchangeSelected:"Seleccionades: {n}/10",exchangeReady:"Ja tens 10 peces. Ara fes el canvi.",exchangeSameHouse:"Les 10 peces han de ser de la mateixa casa. Desmarca la selecció actual abans de triar una altra casa.",exchangeNeedTen:"Selecciona exactament 10 peces d’una mateixa casa abans de fer el canvi.",exchangeNoHigher:"Des d’eixa casa no pots fer un canvi cap a l’esquerra.",newChallenge:"🎲 Nou repte",place:"Valor posicional",compose:"Compon i descompon",order:"Ordena els nombres",orderPrompt:"Prem de menor a major.",discover:"Descobreix el nombre",hear:"👂 L'escolte",see:"👀 El veig",higher:"🔎 Més o menys",try:"Provar",game:"Camí a la piscina",gameIntro:"Troba el nombre que demana la mascota.",points:"Punts",range:"Rang",accuracy:"Precisió",rewards:"Recompenses",start:"▶ Iniciar",pause:"⏸ Pausa",resume:"▶ Reprendre",end:"■ Acabar",find:"Busca {n}.",miss:"S'ha tirat a la piscina. Anem amb un altre.",gameOver:"Partida acabada. {n} punts.",more:"És més gran.",less:"És més menut.",found:"L'has trobat!",composeAsk:"Quin nombre formen estes quantitats?",decomposeAsk:"Escriu la descomposició additiva de {n}.",positionQ:"En {n}, quina xifra ocupa les {p}?",valueQ:"En {n}, quant val la xifra destacada?",nameQ:"En {n}, quina posició ocupa la xifra destacada?",unit:"unitats",ten:"desenes",hundred:"centenes",thousand:"unitats de miler",normalize:"Busca la casa que té 10 o més peces i fes el canvi.",noExchange:"Eixe canvi no és possible ara.",higherStart:"Estic pensant un nombre entre 0 i {max}.",hearAsk:"Quin nombre has escoltat?",seeAsk:"Quin nombre has vist?"},
+ en:{title:"🔢 Number Laboratory",sub:"Understand place value up to 9,999",ready:"Choose a mode to begin.",show:"Show",other:"🎲 Another",listen:"🔊 Listen",series:"Sequences",observe:"See how each digit changes with its position.",build:"Build the number",remove:"↩ Remove last",empty:"↺ Clear",check:"✔ Check",buildAsk:"Build {n}.",correct:"Great job!",wrong:"Check the quantity.",youHave:"You have {n}",exchange:"Base-ten exchanges",exchangePrompt:"Find a place with 10 or more pieces. Select exactly 10 pieces from that same place, then make the exchange. Watch what happens in the place to the left.",exchangeTotal:"The total value is {n}. It must stay the same after the exchange.",exchangeAction:"🔄 Exchange the 10 selected pieces",exchangeDone:"That’s it! 10 {low} have become 1 {high}. The value is still {total}.",exchangeExplain:"10 {low} = 1 {high}.",exchangeSelected:"Selected: {n}/10",exchangeReady:"You have 10 pieces. Now make the exchange.",exchangeSameHouse:"All 10 pieces must come from the same place. Clear the current selection before choosing another place.",exchangeNeedTen:"Select exactly 10 pieces from the same place before making the exchange.",exchangeNoHigher:"You cannot exchange from that place to a place on the left.",newChallenge:"🎲 New challenge",place:"Place value",compose:"Compose and decompose",order:"Order the numbers",orderPrompt:"Tap from smallest to largest.",discover:"Discover the number",hear:"👂 I hear it",see:"👀 I see it",higher:"🔎 Higher or lower",try:"Try",game:"Path to the pool",gameIntro:"Find the number the mascot asks for.",points:"Points",range:"Range",accuracy:"Accuracy",rewards:"Rewards",start:"▶ Start",pause:"⏸ Pause",resume:"▶ Resume",end:"■ End",find:"Find {n}.",miss:"It jumped into the pool. Let's try another.",gameOver:"Game over. {n} points.",more:"It is higher.",less:"It is lower.",found:"You found it!",composeAsk:"What number do these amounts make?",decomposeAsk:"Write the expanded form of {n}.",positionQ:"In {n}, which digit is in the {p} place?",valueQ:"In {n}, what is the value of the highlighted digit?",nameQ:"In {n}, which place does the highlighted digit occupy?",unit:"ones",ten:"tens",hundred:"hundreds",thousand:"thousands",normalize:"Find the place with 10 or more pieces and make the exchange.",noExchange:"That exchange is not possible now.",higherStart:"I am thinking of a number from 0 to {max}.",hearAsk:"Which number did you hear?",seeAsk:"Which number did you see?"}
+};
+function t(k,v={}){let s=(TX[state.lang]||TX.es)[k]??TX.es[k]??k;return String(s).replace(/\{(\w+)\}/g,(_,n)=>v[n]??"")}
+function activePositions(){return POS.filter(p=>p.value<=state.max)}
+function digits(n){return {um:Math.floor(n/1000)%10,c:Math.floor(n/100)%10,d:Math.floor(n/10)%10,u:n%10}}
+function positionName(key){return key==="u"?t("unit"):key==="d"?t("ten"):key==="c"?t("hundred"):t("thousand")}
+function positionSpeechName(key,count=2){
+  const names={
+    es:{u:["unidad","unidades"],d:["decena","decenas"],c:["centena","centenas"],um:["unidad de millar","unidades de millar"]},
+    va:{u:["unitat","unitats"],d:["desena","desenes"],c:["centena","centenes"],um:["unitat de miler","unitats de miler"]},
+    en:{u:["one","ones"],d:["ten","tens"],c:["hundred","hundreds"],um:["thousand","thousands"]}
+  };
+  const set=names[state.lang]||names.es;
+  return set[key][count===1?0:1];
+}
+function fmt(n){return Number(n).toLocaleString(state.lang==="en"?"en-GB":"es-ES")}
+function numberWords(n,lang=state.lang){n=clamp(Math.trunc(n),0,9999);if(lang==="en")return enWords(n);if(lang==="va")return vaWords(n);return esWords(n)}
+function esUnder100(n){const u=["cero","uno","dos","tres","cuatro","cinco","seis","siete","ocho","nueve"],sp={10:"diez",11:"once",12:"doce",13:"trece",14:"catorce",15:"quince",16:"dieciséis",17:"diecisiete",18:"dieciocho",19:"diecinueve",20:"veinte",21:"veintiuno",22:"veintidós",23:"veintitrés",24:"veinticuatro",25:"veinticinco",26:"veintiséis",27:"veintisiete",28:"veintiocho",29:"veintinueve"},te={30:"treinta",40:"cuarenta",50:"cincuenta",60:"sesenta",70:"setenta",80:"ochenta",90:"noventa"};if(n<10)return u[n];if(n<=29)return sp[n];let a=Math.floor(n/10)*10,b=n%10;return b?`${te[a]} y ${u[b]}`:te[a]}
+function esWords(n){if(n<100)return esUnder100(n);if(n<1000){let h=Math.floor(n/100),r=n%100;if(n===100)return"cien";const hs=["","ciento","doscientos","trescientos","cuatrocientos","quinientos","seiscientos","setecientos","ochocientos","novecientos"];return r?`${hs[h]} ${esUnder100(r)}`:hs[h]}let th=Math.floor(n/1000),r=n%1000,p=th===1?"mil":`${esUnder100(th)} mil`;return r?`${p} ${esWords(r)}`:p}
+function vaUnder100(n){const u=["zero","u","dos","tres","quatre","cinc","sis","set","huit","nou"],sp={10:"deu",11:"onze",12:"dotze",13:"tretze",14:"catorze",15:"quinze",16:"setze",17:"dèsset",18:"díhuit",19:"dènou",20:"vint"},te={30:"trenta",40:"quaranta",50:"cinquanta",60:"seixanta",70:"setanta",80:"huitanta",90:"noranta"};if(n<10)return u[n];if(n<=20)return sp[n];if(n<30)return`vint-i-${u[n%10]}`;let a=Math.floor(n/10)*10,b=n%10;return b?`${te[a]}-${u[b]}`:te[a]}
+function vaWords(n){if(n<100)return vaUnder100(n);if(n<1000){let h=Math.floor(n/100),r=n%100,hs=["","cent","dos-cents","tres-cents","quatre-cents","cinc-cents","sis-cents","set-cents","huit-cents","nou-cents"];return r?`${hs[h]} ${vaUnder100(r)}`:hs[h]}let th=Math.floor(n/1000),r=n%1000,p=th===1?"mil":`${vaUnder100(th)} mil`;return r?`${p} ${vaWords(r)}`:p}
+function enUnder100(n){const u=["zero","one","two","three","four","five","six","seven","eight","nine"],sp={10:"ten",11:"eleven",12:"twelve",13:"thirteen",14:"fourteen",15:"fifteen",16:"sixteen",17:"seventeen",18:"eighteen",19:"nineteen"},te={20:"twenty",30:"thirty",40:"forty",50:"fifty",60:"sixty",70:"seventy",80:"eighty",90:"ninety"};if(n<10)return u[n];if(n<20)return sp[n];let a=Math.floor(n/10)*10,b=n%10;return b?`${te[a]}-${u[b]}`:te[a]}
+function enWords(n){if(n<100)return enUnder100(n);if(n<1000){let h=Math.floor(n/100),r=n%100,p=`${enUnder100(h)} hundred`;return r?`${p} ${enUnder100(r)}`:p}let th=Math.floor(n/1000),r=n%1000,p=`${enUnder100(th)} thousand`;return r?`${p} ${enWords(r)}`:p}
+function speechLang(){return state.lang==="en"?"en-GB":state.lang==="va"?"ca-ES":"es-ES"}
+let lastSpeech="";
+function makeUtterance(text){const u=new SpeechSynthesisUtterance(String(text));u.lang=speechLang();u.rate=state.lang==="en"?.78:.74;return u}
+function speak(text){lastSpeech=String(text);$("say").textContent=lastSpeech;if(!state.sound||!("speechSynthesis"in window))return;window.speechSynthesis.cancel();window.speechSynthesis.speak(makeUtterance(lastSpeech))}
+function speakOnly(text){lastSpeech=String(text);if(!state.sound||!("speechSynthesis"in window))return;window.speechSynthesis.cancel();window.speechSynthesis.speak(makeUtterance(lastSpeech))}
+function sfx(kind){if(!state.sound)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const c=sfx.ctx??=new AC(),now=c.currentTime;const tones=kind==="ok"?[[520,.08],[660,.1],[790,.14]]:kind==="bad"?[[220,.12],[160,.18]]:[[400,.08],[290,.12]];tones.forEach(([f,d],i)=>{const o=c.createOscillator(),g=c.createGain();o.frequency.value=f;o.type="sine";g.gain.setValueAtTime(.0001,now+i*.07);g.gain.exponentialRampToValueAtTime(.045,now+i*.07+.015);g.gain.exponentialRampToValueAtTime(.0001,now+i*.07+d);o.connect(g).connect(c.destination);o.start(now+i*.07);o.stop(now+i*.07+d+.02)})}
+function star(){sfx("ok")}
+function status(id,msg,type=""){const e=$(id);e.className="status"+(type?` ${type}`:"");e.textContent=msg}
+function randomSmart(){const max=state.max;const special=[9,10,11,19,20,21,90,99,100,101,109,110,190,199,200,909,990,999,1000,1001,1010,1090,1100,1900,1999,2000,4005,7008,9090,9999].filter(n=>n<=max);return Math.random()<.32&&special.length?special[rnd(0,special.length-1)]:rnd(0,max)}
+function expanded(n){const d=digits(n);const parts=[];activePositions().forEach(p=>{if(d[p.key])parts.push(d[p.key]*p.value)});return parts.length?parts.join(" + "):"0"}
+function tableHTML(n,focusKey=null){const d=digits(n),ap=activePositions();return `<table class="place-table"><thead><tr>${ap.map(p=>`<th class="${p.cls}">${p[state.lang]||p.es}</th>`).join("")}</tr></thead><tbody><tr>${ap.map(p=>`<td class="${p.cls}${focusKey===p.key?" pv-focus":""}">${d[p.key]}</td>`).join("")}</tr></tbody></table>`}
+function blocksHTML(n){const d=digits(n),cfg=[{key:"um",label:positionName("um"),cls:"thousand-block"},{key:"c",label:positionName("c"),cls:"hundred-block"},{key:"d",label:positionName("d"),cls:"ten-block"},{key:"u",label:positionName("u"),cls:"unit-block"}].filter(x=>POS.find(p=>p.key===x.key).value<=state.max);return `<div class="base10">${cfg.map(x=>`<div class="block-column"><strong>${d[x.key]} ${x.label}</strong><div class="blocks">${Array.from({length:d[x.key]},()=>`<i class="${x.cls}"></i>`).join("")}</div></div>`).join("")}</div>`}
+function abacusHTML(n){const d=digits(n);return `<div class="abacus">${activePositions().map(p=>`<div class="rod-wrap"><div class="rod">${Array.from({length:d[p.key]},()=>`<i class="bead ${p.key}"></i>`).join("")}</div><div class="rod-label">${p[state.lang]||p.es}: ${d[p.key]}</div></div>`).join("")}</div>`}
+function visualHTML(n,view){return view==="blocks"?blocksHTML(n):view==="abacus"?abacusHTML(n):tableHTML(n)}
+
+function renderExplore(){state.number=clamp(state.number,0,state.max);$("bigNumber").textContent=fmt(state.number);$("numberWord").textContent=numberWords(state.number);$("expanded").textContent=expanded(state.number);$("numberInput").max=state.max;$("numberInput").value=state.number;$("exploreVisual").innerHTML=visualHTML(state.number,state.view);renderNavSteps()}
+function renderNavSteps(){const vals=[1,10,100,1000].filter(v=>v<=state.max);const labMinus=state.lang==="en"?"Subtract":state.lang==="va"?"Restar":"Restar",labPlus=state.lang==="en"?"Add":state.lang==="va"?"Sumar":"Sumar";const buttons=(sign,cls)=>`<div class="nav-step-row"><span class="nav-step-label">${sign<0?labMinus:labPlus}</span><div class="nav-step-buttons ${cls}">${vals.map(v=>`<button data-delta="${sign*v}">${sign<0?"−":"+"}${v===1000?"1.000":v}</button>`).join("")}</div></div>`;$("navSteps").innerHTML=buttons(-1,"subtract")+buttons(1,"add");$("navSteps").querySelectorAll("[data-delta]").forEach(b=>b.onclick=()=>{state.number=clamp(state.number+Number(b.dataset.delta),0,state.max);renderExplore();speak(numberWords(state.number))})}
+const B={target:0,counts:{um:0,c:0,d:0,u:0},history:[]};function buildValue(){return B.counts.um*1000+B.counts.c*100+B.counts.d*10+B.counts.u}function normalizeBuild(){if(B.counts.u>=10){B.counts.d+=Math.floor(B.counts.u/10);B.counts.u%=10}if(B.counts.d>=10){B.counts.c+=Math.floor(B.counts.d/10);B.counts.d%=10}if(B.counts.c>=10){B.counts.um+=Math.floor(B.counts.c/10);B.counts.c%=10}}
+function newBuild(){B.target=randomSmart()||rnd(1,state.max);B.counts={um:0,c:0,d:0,u:0};B.history=[];$("buildTarget").textContent=fmt(B.target);speak(t("buildAsk",{n:numberWords(B.target)}));renderBuild();status("buildStatus","")}
+function renderBuild(){const v=buildValue();$("buildVisual").innerHTML=blocksHTML(v);$("buildReadout").textContent=t("youHave",{n:fmt(v)});$("builderButtons").innerHTML=activePositions().map(p=>`<button data-place="${p.value}">+ ${p.value===1000?"1.000":p.value}</button>`).join("");$("builderButtons").querySelectorAll("button").forEach(b=>b.onclick=()=>{const val=Number(b.dataset.place),p=POS.find(x=>x.value===val);B.history.push(JSON.stringify(B.counts));B.counts[p.key]++;normalizeBuild();renderBuild()})}
+
+const X={counts:{um:0,c:0,d:0,u:0},value:0,done:false,selectedHouse:null,selected:new Set()};
+function exchangeValue(){return X.counts.um*1000+X.counts.c*100+X.counts.d*10+X.counts.u}
+function newExchange(){
+  const ap=activePositions(),idx=rnd(1,ap.length-1),low=ap[idx];
+  X.counts={um:0,c:0,d:0,u:0};
+  ap.forEach(p=>X.counts[p.key]=rnd(0,4));
+  X.counts[low.key]=rnd(10,18);
+  X.value=exchangeValue();X.done=false;X.selectedHouse=null;X.selected=new Set();
+  $("exchangeGuide").textContent=t("exchangePrompt");
+  renderExchange();
+  status("exchangeStatus",t("normalize"));
+  speak(t("normalize"));
+}
+function exchangePieceButton(p,i){
+  const selected=X.selectedHouse===p.key&&X.selected.has(i);
+  return `<button type="button" class="exchange-piece${selected?" selected":""}" data-house="${p.key}" data-piece="${i}" aria-pressed="${selected}" aria-label="${p[state.lang]||p.es} ${i+1}"></button>`;
+}
+function exchangePieces(p,count){
+  return `<div class="exchange-house ${p.cls}"><div class="house-name">${p[state.lang]||p.es}</div><div class="house-count">${count}</div><div class="exchange-pieces">${Array.from({length:Math.min(count,18)},(_,i)=>exchangePieceButton(p,i)).join("")}</div></div>`;
+}
+function exchangeCanonical(){return activePositions().every(p=>X.counts[p.key]>=0&&X.counts[p.key]<10)}
+function updateExchangeSelection(){
+  $("exchangeSelection").textContent=t("exchangeSelected",{n:X.selected.size});
+  const btn=$("exchangeButtons").querySelector(".exchange-action");
+  if(btn)btn.disabled=X.selected.size!==10;
+}
+function toggleExchangePiece(button){
+  if(X.done)return;
+  const house=button.dataset.house,idx=Number(button.dataset.piece);
+  if(X.selectedHouse!==null&&X.selectedHouse!==house){
+    sfx("bad");status("exchangeStatus",t("exchangeSameHouse"),"bad");speak(t("exchangeSameHouse"));return;
+  }
+  if(X.selectedHouse===null)X.selectedHouse=house;
+  if(X.selected.has(idx)){
+    X.selected.delete(idx);
+  }else{
+    if(X.selected.size>=10){sfx("bad");status("exchangeStatus",t("exchangeNeedTen"),"bad");return}
+    X.selected.add(idx);
+  }
+  if(X.selected.size===0)X.selectedHouse=null;
+  renderExchange();
+  status("exchangeStatus",X.selected.size===10?t("exchangeReady"):t("normalize"));
+}
+function performExchange(){
+  if(X.done)return;
+  if(X.selected.size!==10||!X.selectedHouse){
+    sfx("bad");status("exchangeStatus",t("exchangeNeedTen"),"bad");speak(t("exchangeNeedTen"));return;
+  }
+  const ap=activePositions(),i=ap.findIndex(p=>p.key===X.selectedHouse);
+  if(i<=0){
+    sfx("bad");status("exchangeStatus",t("exchangeNoHigher"),"bad");speak(t("exchangeNoHigher"));return;
+  }
+  const low=ap[i],high=ap[i-1];
+  if(X.counts[low.key]<10){
+    sfx("bad");status("exchangeStatus",t("exchangeNeedTen"),"bad");return;
+  }
+  X.counts[low.key]-=10;X.counts[high.key]+=1;
+  X.selectedHouse=null;X.selected=new Set();
+  if(exchangeCanonical()){
+    X.done=true;star();renderExchange();
+    const msg=t("exchangeDone",{low:low[state.lang]||low.es,high:high[state.lang]||high.es,total:fmt(X.value)});
+    const spoken=t("exchangeDone",{
+      low:positionSpeechName(low.key,10),
+      high:positionSpeechName(high.key,1),
+      total:numberWords(X.value)
+    });
+    status("exchangeStatus",msg,"good");
+    $("say").textContent=msg;
+    speakOnly(spoken);
+  }else{
+    renderExchange();
+    const msg=t("exchangeExplain",{low:low[state.lang]||low.es,high:high[state.lang]||high.es});
+    const spoken=t("exchangeExplain",{
+      low:positionSpeechName(low.key,10),
+      high:positionSpeechName(high.key,1)
+    });
+    status("exchangeStatus",msg,"good");
+    $("say").textContent=msg;
+    speakOnly(spoken);
+  }
+}
+function renderExchange(){
+  const ap=activePositions();
+  $("exchangeTotal").textContent=t("exchangeTotal",{n:fmt(X.value)});
+  $("exchangeCounters").innerHTML=ap.map(p=>exchangePieces(p,X.counts[p.key])).join("");
+  $("exchangeCounters").querySelectorAll(".exchange-piece").forEach(b=>b.onclick=()=>toggleExchangePiece(b));
+  $("exchangeButtons").innerHTML=X.done?"":`<button class="exchange-action" type="button">${t("exchangeAction")}</button>`;
+  const action=$("exchangeButtons").querySelector(".exchange-action");
+  if(action){action.onclick=performExchange;action.disabled=X.selected.size!==10}
+  updateExchangeSelection();
+}
+
+let P={n:0,type:"value",answer:null};function shuffled(a){return [...a].sort(()=>Math.random()-.5)}function uniqueOptions(correct,pool,count=4){const out=[correct];for(const x of shuffled(pool))if(!out.some(y=>String(y)===String(x))&&out.push(x)>=count)break;return shuffled(out)}
+function newPlace(){P.n=Math.max(1,randomSmart());const ap=activePositions(),d=digits(P.n),types=["digit","value","name"],type=types[rnd(0,2)],pickPool=type==="digit"?ap:ap.filter(x=>d[x.key]!==0),p=(pickPool.length?pickPool:ap)[rnd(0,(pickPool.length?pickPool:ap).length-1)];P.type=type;let q,ans,pool,focus=null;if(type==="digit"){q=t("positionQ",{n:fmt(P.n),p:positionName(p.key)});ans=d[p.key];pool=[0,1,2,3,4,5,6,7,8,9]}else if(type==="value"){q=t("valueQ",{n:fmt(P.n)});ans=d[p.key]*p.value;pool=ap.map(x=>d[p.key]*x.value).concat([d[p.key],d[p.key]*10,d[p.key]*100,d[p.key]*1000]);focus=p.key}else{q=t("nameQ",{n:fmt(P.n)});ans=positionName(p.key);pool=ap.map(x=>positionName(x.key));focus=p.key}P.answer=ans;$("placeQuestion").textContent=q;$("placeVisual").innerHTML=tableHTML(P.n,focus);$("placeChoices").innerHTML=uniqueOptions(ans,pool).map(x=>`<button data-v="${String(x)}">${typeof x==="number"?fmt(x):x}</button>`).join("");$("placeChoices").querySelectorAll("button").forEach(b=>b.onclick=()=>{const ok=String(b.dataset.v)===String(ans);if(ok){star();status("placeStatus",t("correct"),"good");speak(t("correct"));setTimeout(newPlace,850)}else{sfx("bad");status("placeStatus",t("wrong"),"bad");speak(t("wrong"))}});status("placeStatus","")}
+
+let composeMode="compose",C={n:0,answer:""};function newCompose(){C.n=Math.max(1,randomSmart());if(composeMode==="compose"){$("composePrompt").textContent=t("composeAsk");$("composeExpression").textContent=expanded(C.n);C.answer=String(C.n);$("composeAnswer").placeholder="1234"}else{$("composePrompt").textContent=t("decomposeAsk",{n:fmt(C.n)});$("composeExpression").textContent=fmt(C.n);C.answer=expanded(C.n).replace(/\s/g,"");$("composeAnswer").placeholder=state.lang==="en"?"3000+400+20+7":"3000 + 400 + 20 + 7"}$("composeAnswer").value="";status("composeStatus","")}
+function checkCompose(){let v=$("composeAnswer").value.trim();const ok=composeMode==="compose"?Number(v.replace(/[. ,]/g,""))===C.n:v.replace(/\s/g,"").replace(/\./g,"")===C.answer.replace(/\./g,"");if(ok){star();status("composeStatus",t("correct"),"good");speak(t("correct"));setTimeout(newCompose,850)}else{status("composeStatus",t("wrong"),"bad");sfx("bad")}}
+
+let O={nums:[],picked:[]};function newOrder(){const set=new Set();while(set.size<4)set.add(randomSmart());O.nums=[...set];O.picked=[];renderOrder();status("orderStatus","")}
+function renderOrder(){$("orderCards").innerHTML=O.nums.map(n=>`<button class="order-card ${O.picked.includes(n)?"selected":""}" data-n="${n}" ${O.picked.includes(n)?"disabled":""}>${fmt(n)}</button>`).join("");$("orderCards").querySelectorAll("button").forEach(b=>b.onclick=()=>{O.picked.push(Number(b.dataset.n));renderOrder()});$("orderResult").innerHTML=O.picked.map(n=>`<span class="order-picked">${fmt(n)}</span>`).join("")}
+function checkOrder(){const target=[...O.nums].sort((a,b)=>a-b),ok=target.every((n,i)=>O.picked[i]===n);if(ok){star();status("orderStatus",t("correct"),"good");speak(t("correct"));setTimeout(newOrder,850)}else{status("orderStatus",t("wrong"),"bad");sfx("bad")}}
+
+let discoverMode="hear",D={target:0,flashTimer:null,recentHear:[]};
+function hearTarget(){
+  const recent=new Set(D.recentHear),max=state.max;
+  let n=rnd(0,max),tries=0;
+  while(recent.has(n)&&tries++<100)n=rnd(0,max);
+  D.recentHear.push(n);
+  const keep=Math.min(12,Math.max(4,Math.floor((max+1)/4)));
+  if(D.recentHear.length>keep)D.recentHear.splice(0,D.recentHear.length-keep);
+  return n;
+}function choiceNumbers(target){const s=new Set([target]);const ds=digits(target),mods=[target+9,target-9,target+90,target-90,target+100,target-100,target+1000,target-1000];for(const n of shuffled(mods))if(n>=0&&n<=state.max)s.add(n);while(s.size<4)s.add(rnd(0,state.max));return shuffled([...s].slice(0,4))}
+function newDiscover(){
+  clearTimeout(D.flashTimer);
+  $("discoverChoices").innerHTML="";
+  $("higherBox").hidden=true;
+  status("discoverStatus","");
+  if(discoverMode==="hear"){
+    D.target=hearTarget();
+    $("discoverArea").innerHTML='<div class="flash">🔊 ?</div>';
+    $("say").textContent=t("hearAsk");
+    speakOnly(numberWords(D.target));
+    renderDiscoverChoices();
+  }else if(discoverMode==="see"){
+    D.target=randomSmart();
+    $("discoverArea").innerHTML=tableHTML(D.target);
+    speak(t("seeAsk"));
+    D.flashTimer=setTimeout(()=>{$("discoverArea").innerHTML='<div class="flash">?</div>';renderDiscoverChoices()},1800);
+  }else{
+    D.target=randomSmart();
+    $("discoverArea").innerHTML='<div class="flash">🤔</div>';
+    $("higherBox").hidden=false;
+    $("higherInput").max=state.max;
+    $("higherInput").value="";
+    speak(t("higherStart",{max:fmt(state.max)}));
+  }
+}
+function renderDiscoverChoices(){$("discoverChoices").innerHTML=choiceNumbers(D.target).map(n=>`<button data-n="${n}">${fmt(n)}</button>`).join("");$("discoverChoices").querySelectorAll("button").forEach(b=>b.onclick=()=>{if(Number(b.dataset.n)===D.target){star();status("discoverStatus",t("correct"),"good");speak(t("correct"));setTimeout(newDiscover,900)}else{status("discoverStatus",t("wrong"),"bad");sfx("bad")}})}
+function higherTry(){const v=Number($("higherInput").value);if(!Number.isFinite(v))return;if(v===D.target){star();status("discoverStatus",t("found"),"good");speak(t("found"));setTimeout(newDiscover,1000)}else{const m=v<D.target?t("more"):t("less");status("discoverStatus",m);speak(m)}}
+
+const GAME_FACES=["🧒","👧","👦","👧","🧒","👦"],GSPEED={slow:48,normal:68,fast:88};const G={running:false,paused:false,speed:"normal",lanes:1,score:0,target:null,targetSpawned:false,spawnCountdown:1,runners:[],last:0,spawnAt:0,pairQueue:[],history:[],raf:0};
+function renderGameLanes(){const scene=$("gameScene"),h=G.lanes===1?245:G.lanes===2?355:475,bottoms=G.lanes===1?[15]:G.lanes===2?[15,135]:[15,135,255];scene.style.height=h+"px";scene.innerHTML=bottoms.map((b,i)=>`<div class="game-lane" data-lane="${i}" style="bottom:${b}px"><div class="game-path"></div><div class="game-trampoline"></div><div class="game-pool"></div></div>`).join("")}
+function gameMetrics(){const h=G.history.slice(-12);if(!h.length)return"—";return Math.round(100*h.filter(Boolean).length/h.length)+"%"}function updateGameHud(){$("gameScore").textContent=G.score;$("gameRange").textContent=`0–${fmt(state.max)}`;$("gameAccuracy").textContent=gameMetrics();$("gameRewards").textContent="⭐ "+Math.floor(G.score/5)}
+function gameTarget(){G.target=randomSmart();G.targetSpawned=false;G.spawnCountdown=rnd(1,Math.max(2,G.lanes+1));$("gamePrompt").textContent=numberWords(G.target);speak(t("find",{n:numberWords(G.target)}))}
+function gameDecoy(){let n;do n=randomSmart();while(n===G.target);return n}
+function spawnRunner(forceTarget=false,laneForced=null,speedFactor=1){if(!G.running||G.paused)return;const scene=$("gameScene"),lane=laneForced??rnd(0,G.lanes-1),host=scene.querySelector(`[data-lane="${lane}"]`);if(!host)return;let n;if(forceTarget){n=G.target;G.targetSpawned=true}else if(!G.targetSpawned&&--G.spawnCountdown<=0){n=G.target;G.targetSpawned=true}else n=gameDecoy();const el=document.createElement("button");el.className="runner";el.dataset.n=n;const off=(G.runners.filter(r=>r.lane===lane).length%2)*8;el.style.bottom=(26+off)+"px";el.innerHTML=`<span class="runner-card"><span class="runner-face">${GAME_FACES[rnd(0,GAME_FACES.length-1)]}</span><span class="runner-num" style="font-size:${String(n).length>=4?".92rem":String(n).length===3?"1.05rem":"1.2rem"}">${n}</span></span>`;const startX=-120;el.style.transform=`translate3d(${startX}px,0,0)`;const r={el,lane,n,x:startX,speed:GSPEED[G.speed]*(.78+Math.random()*.48)*speedFactor,done:false};host.appendChild(el);G.runners.push(r);el.onclick=()=>{if(r.done||!G.running||G.paused||G.target==null)return;if(r.n===G.target){r.done=true;G.score++;G.history.push(true);el.classList.add("correct");sfx("ok");updateGameHud();G.target=null;setTimeout(()=>removeRunner(r),650);setTimeout(gameTarget,450)}else{G.score=Math.max(0,G.score-1);G.history.push(false);el.classList.remove("shake");void el.offsetWidth;el.classList.add("shake");sfx("bad");updateGameHud()}}}
+function removeRunner(r){r.el.remove();G.runners=G.runners.filter(x=>x!==r)}function gameLoop(ts){if(!G.running)return;if(!G.last)G.last=ts;const dt=Math.min(.04,(ts-G.last)/1000);G.last=ts;if(!G.paused){const scene=$("gameScene"),end=Math.max(250,scene.clientWidth-245);for(const r of [...G.runners]){if(r.done)continue;r.x+=r.speed*dt;r.el.style.transform=`translate3d(${r.x}px,0,0)`;if(r.x>=end){r.done=true;if(r.n===G.target){G.history.push(false);sfx("miss");status("gameStatus",t("miss"));G.target=null;setTimeout(gameTarget,300)}removeRunner(r)}}if(G.pairQueue.length){const due=G.pairQueue.filter(p=>p.at<=ts);G.pairQueue=G.pairQueue.filter(p=>p.at>ts);due.forEach(p=>spawnRunner(false,p.lane,p.speedFactor))}if(ts>=G.spawnAt){spawnRunner();G.spawnAt=ts+rnd(900,1550);if(Math.random()<.27){const lane=rnd(0,G.lanes-1);G.pairQueue.push({at:ts+rnd(260,360),lane,speedFactor:Math.random()<.5?.65:1.35})}}}G.raf=requestAnimationFrame(gameLoop)}
+function startGame(){G.running=false;cancelAnimationFrame(G.raf);G.runners.forEach(r=>r.el.remove());Object.assign(G,{running:true,paused:false,score:0,target:null,targetSpawned:false,spawnCountdown:1,runners:[],last:0,spawnAt:0,pairQueue:[],history:[]});renderGameLanes();updateGameHud();status("gameStatus","");gameTarget();G.raf=requestAnimationFrame(gameLoop)}function pauseGame(){if(!G.running)return;G.paused=!G.paused;$("gamePause").textContent=G.paused?t("resume"):t("pause");if(!G.paused){G.last=0}}
+function endGame(){if(!G.running)return;G.running=false;cancelAnimationFrame(G.raf);G.runners.forEach(r=>r.el.remove());G.runners=[];G.pairQueue=[];const msg=t("gameOver",{n:G.score});$("gamePrompt").textContent=msg;status("gameStatus",msg,G.score?"good":"");speak(msg)}
+
+function selectMode(m){if(state.mode==="game"&&m!=="game")endGame();state.mode=m;document.querySelectorAll(".mode").forEach(x=>x.classList.toggle("active",x.id===m+"Mode"));$("tabs").querySelectorAll("button").forEach(b=>b.setAttribute("aria-selected",b.dataset.mode===m));if(m==="explore")renderExplore();if(m==="build")newBuild();if(m==="exchange")newExchange();if(m==="place")newPlace();if(m==="compose")newCompose();if(m==="order")newOrder();if(m==="discover")newDiscover();if(m==="game"){renderGameLanes();updateGameHud();$("gamePrompt").textContent=t("start")}}
+function setMax(max){state.max=max;state.number=clamp(state.number,0,max);D.recentHear=[];$("ranges").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",Number(b.dataset.max)===max));if(state.mode==="game")endGame();selectMode(state.mode)}
+function applyLanguage(){document.documentElement.lang=state.lang==="va"?"ca":state.lang;$("appTitle").textContent=t("title");$("appSubtitle").textContent=t("sub");$("numberInputLabel").textContent=state.lang==="en"?"Enter a number":state.lang==="va"?"Escriu un nombre":"Escribe un número";$("showNumber").textContent=t("show");$("randomNumber").textContent=t("other");$("speakNumber").textContent=t("listen");$("exploreStatus").textContent=t("observe");$("buildTitle").textContent=t("build");$("buildUndo").textContent=t("remove");$("buildReset").textContent=t("empty");$("buildCheck").textContent=t("check");$("exchangeTitle").textContent=t("exchange");$("exchangeNew").textContent=t("newChallenge");$("placeTitle").textContent=t("place");$("composeTitle").textContent=t("compose");$("orderTitle").textContent=t("order");$("orderPrompt").textContent=t("orderPrompt");$("discoverTitle").textContent=t("discover");const db=$("discoverTabs").querySelectorAll("button");db[0].textContent=t("hear");db[1].textContent=t("see");db[2].textContent=t("higher");$("higherTry").textContent=t("try");$("gameTitle").textContent=t("game");$("gameIntro").textContent=t("gameIntro");$("pointsLabel").textContent=t("points");$("rangeLabel").textContent=t("range");$("accuracyLabel").textContent=t("accuracy");$("rewardLabel").textContent=t("rewards");$("gameStart").textContent=t("start");$("gamePause").textContent=G.paused?t("resume"):t("pause");$("gameEnd").textContent=t("end");$("say").textContent=t("ready");$("langs").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.lang===state.lang));selectMode(state.mode)}
+
+$("tabs").querySelectorAll("button").forEach(b=>b.onclick=()=>selectMode(b.dataset.mode));$("ranges").querySelectorAll("button").forEach(b=>b.onclick=()=>setMax(Number(b.dataset.max)));$("langs").querySelectorAll("button").forEach(b=>b.onclick=()=>{state.lang=b.dataset.lang;applyLanguage()});$("soundBtn").onclick=()=>{state.sound=!state.sound;$("soundBtn").textContent=state.sound?"🔊 Sonido":"🔇 Sonido"};$("repeatBtn").onclick=()=>speak(lastSpeech||$("say").textContent);$("showNumber").onclick=()=>{state.number=clamp(Number($("numberInput").value)||0,0,state.max);renderExplore();speak(numberWords(state.number))};$("randomNumber").onclick=()=>{state.number=randomSmart();renderExplore();speak(numberWords(state.number))};$("speakNumber").onclick=()=>speak(numberWords(state.number));$("exploreViews").querySelectorAll("button").forEach(b=>b.onclick=()=>{state.view=b.dataset.view;$("exploreViews").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderExplore()});
+$("buildUndo").onclick=()=>{if(B.history.length){B.counts=JSON.parse(B.history.pop());renderBuild()}};$("buildReset").onclick=()=>{B.counts={um:0,c:0,d:0,u:0};B.history=[];renderBuild()};$("buildCheck").onclick=()=>{if(buildValue()===B.target){star();status("buildStatus",t("correct"),"good");speak(t("correct"));setTimeout(newBuild,900)}else{status("buildStatus",t("wrong"),"bad");sfx("bad")}};
+$("exchangeNew").onclick=newExchange;
+$("composeTabs").querySelectorAll("button").forEach(b=>b.onclick=()=>{composeMode=b.dataset.compose;$("composeTabs").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));newCompose()});$("composeCheck").onclick=checkCompose;$("composeAnswer").addEventListener("keydown",e=>{if(e.key==="Enter")checkCompose()});$("composeNew").onclick=newCompose;
+$("orderReset").onclick=()=>{O.picked=[];renderOrder();status("orderStatus","")};$("orderCheck").onclick=checkOrder;$("orderNew").onclick=newOrder;
+$("discoverTabs").querySelectorAll("button").forEach(b=>b.onclick=()=>{discoverMode=b.dataset.discover;$("discoverTabs").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));newDiscover()});$("higherTry").onclick=higherTry;$("higherInput").addEventListener("keydown",e=>{if(e.key==="Enter")higherTry()});
+$("gameSpeed").querySelectorAll("button").forEach(b=>b.onclick=()=>{G.speed=b.dataset.speed;$("gameSpeed").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b))});$("gameDifficulty").querySelectorAll("button").forEach(b=>b.onclick=()=>{G.lanes=Number(b.dataset.diff);$("gameDifficulty").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));if(!G.running)renderGameLanes()});$("gameStart").onclick=startGame;$("gamePause").onclick=pauseGame;$("gameEnd").onclick=endGame;
+applyLanguage();renderExplore();
+})();
+</script>
+</body>
+</html>
