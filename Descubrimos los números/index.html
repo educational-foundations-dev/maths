@@ -1,0 +1,2651 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Números para Infantil · v0.8.12</title>
+<style>
+  :root{
+    --bg:#fffaf1;
+    --panel:#ffffff;
+    --ink:#253238;
+    --muted:#6c777b;
+    --line:#d8e1e3;
+    --unit:#ffd166;
+    --unit-dark:#a96f00;
+    --ten:#8ecae6;
+    --ten-dark:#17627f;
+    --accent:#5a7d5a;
+    --focus:#7b2cbf;
+    --good:#2f855a;
+    --bad:#b83232;
+    --shadow:0 8px 24px rgba(35,50,56,.10);
+    --radius:22px;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+  }
+
+  button,input{font:inherit}
+  button{
+    min-height:62px;
+    border:2px solid transparent;
+    border-radius:18px;
+    padding:10px 16px;
+    font-weight:800;
+    cursor:pointer;
+    touch-action:manipulation;
+  }
+  button:focus-visible,input:focus-visible{
+    outline:5px solid color-mix(in srgb, var(--focus) 35%, transparent);
+    outline-offset:3px;
+  }
+
+  .app{
+    width:min(1200px,100%);
+    margin:auto;
+    padding:18px;
+  }
+
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+    margin-bottom:16px;
+  }
+
+  h1{
+    margin:0;
+    font-size:clamp(1.35rem,3vw,2rem);
+  }
+
+  .sound{
+    background:#fff;
+    border-color:var(--line);
+    min-width:110px;
+  }
+
+  .sound-language{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    align-items:stretch;
+  }
+
+  .language-picker{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    padding:8px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:16px;
+  }
+
+  .language-picker .language-label{
+    font-size:.82rem;
+    font-weight:900;
+    color:var(--muted);
+    text-align:center;
+  }
+
+  .language-buttons{
+    display:flex;
+    gap:5px;
+  }
+
+  .language-buttons button{
+    min-height:42px;
+    padding:6px 9px;
+    border-color:var(--line);
+    background:#f7f8f8;
+    font-size:.86rem;
+  }
+
+  .language-buttons button[aria-pressed="true"]{
+    background:#263238;
+    color:#fff;
+  }
+
+  .tabs{
+    display:flex;
+    gap:10px;
+    margin-bottom:16px;
+    flex-wrap:wrap;
+  }
+
+  .tabs button{
+    background:#fff;
+    border-color:var(--line);
+  }
+
+  .tabs button[aria-selected="true"]{
+    background:#263238;
+    color:#fff;
+  }
+
+  .mode{display:none}
+  .mode.active{display:block}
+
+  .grid{
+    display:grid;
+    grid-template-columns:minmax(280px,.8fr) minmax(340px,1.55fr);
+    gap:18px;
+  }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:18px;
+  }
+
+  .number-card{text-align:center}
+
+  .big-number{
+    font-size:clamp(5rem,16vw,10rem);
+    font-weight:900;
+    line-height:.95;
+    letter-spacing:-.06em;
+  }
+
+  .word{
+    margin-top:8px;
+    font-size:clamp(1.6rem,5vw,3rem);
+    font-weight:800;
+    color:var(--accent);
+  }
+
+  .decomp{
+    margin:16px auto 0;
+    font-size:clamp(1.05rem,2.5vw,1.35rem);
+    font-weight:700;
+  }
+
+  .controls{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin-top:20px;
+  }
+
+  .controls button{
+    background:#f5f7f7;
+    border-color:var(--line);
+    font-size:1.2rem;
+  }
+
+  .controls .primary{
+    background:var(--accent);
+    color:#fff;
+    border-color:var(--accent);
+  }
+
+  .field-group{
+    margin-top:18px;
+    text-align:left;
+  }
+
+  label{
+    display:block;
+    font-weight:800;
+    margin-bottom:8px;
+  }
+
+  input{
+    width:100%;
+    min-height:62px;
+    border:2px solid var(--line);
+    border-radius:16px;
+    padding:10px 14px;
+    font-size:1.2rem;
+    background:#fff;
+  }
+
+  .inline{
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:10px;
+  }
+
+  .inline button{
+    background:#eef6ef;
+    border-color:#c6ddc8;
+    color:#2f5e35;
+  }
+
+  .helper{
+    margin:8px 0 0;
+    color:var(--muted);
+    font-size:.95rem;
+  }
+
+  .visual-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+
+  .visual-head h2{margin:0;font-size:1.25rem}
+
+  .view-buttons{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+
+  .view-buttons button{
+    min-height:50px;
+    background:#f7f8f8;
+    border-color:var(--line);
+    padding:8px 14px;
+  }
+
+  .view-buttons button[aria-pressed="true"]{
+    background:#263238;
+    color:#fff;
+  }
+
+  .objects{
+    min-height:315px;
+    padding:14px;
+    background:#fbfcfc;
+    border:2px dashed var(--line);
+    border-radius:18px;
+    overflow:auto;
+  }
+
+  /* Las unidades se colocan SIEMPRE en filas de 10. */
+  .units-grid{
+    display:grid;
+    grid-template-columns:repeat(10, 46px);
+    gap:10px;
+    align-content:start;
+    width:max-content;
+    min-width:100%;
+  }
+
+  .dot{
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    background:var(--unit);
+    border:3px solid var(--unit-dark);
+    display:grid;
+    place-items:center;
+    font-weight:900;
+    color:#573b00;
+    cursor:pointer;
+    user-select:none;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+
+  .dot{min-height:0;padding:0}
+  .dot.b{background:#ffbe3d}
+  .dot:hover{transform:scale(1.07)}
+  .dot.upto{box-shadow:0 0 0 4px rgba(255,209,102,.6)}
+  .dot.counted{
+    transform:scale(1.14);
+    box-shadow:0 0 0 5px rgba(255,209,102,.30);
+  }
+
+  .groups-wrap{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    align-content:flex-start;
+  }
+
+  .ten-group{
+    width:184px;
+    padding:10px;
+    border-radius:18px;
+    background:#e9f7fc;
+    border:3px solid var(--ten-dark);
+  }
+
+  .ten-title{
+    text-align:center;
+    font-weight:900;
+    color:var(--ten-dark);
+    margin-bottom:8px;
+  }
+
+  .ten-grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:7px;
+  }
+
+  .mini-dot{
+    aspect-ratio:1;
+    border-radius:50%;
+    background:var(--ten);
+    border:2px solid var(--ten-dark);
+  }
+
+  .loose{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-content:flex-start;
+  }
+
+  .frame-wrap{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+
+  .ten-frame{
+    width:208px;
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    border:3px solid #4f5b60;
+    border-radius:14px;
+    overflow:hidden;
+    background:#fff;
+  }
+
+  .frame-cell{
+    aspect-ratio:1.08;
+    border:1px solid #9aa4a8;
+    display:grid;
+    place-items:center;
+  }
+
+  .frame-cell span{
+    width:72%;
+    aspect-ratio:1;
+    border-radius:50%;
+    background:var(--unit);
+    border:2px solid var(--unit-dark);
+  }
+
+  .bottom-actions{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin-top:14px;
+  }
+
+  .bottom-actions button{
+    background:#fff;
+    border-color:var(--line);
+  }
+
+  .status{
+    margin-top:14px;
+    min-height:56px;
+    border-radius:16px;
+    padding:12px 14px;
+    background:#f7f9f9;
+    font-size:1.05rem;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+  }
+
+  .status.good{background:#edf8f1;color:var(--good)}
+  .status.bad{background:#fff0f0;color:var(--bad)}
+
+  .zero-message{
+    min-height:260px;
+    display:grid;
+    place-items:center;
+    text-align:center;
+    font-size:1.35rem;
+    color:var(--muted);
+    font-weight:800;
+  }
+
+  /* Modo contar a saltos */
+  .skip-layout{
+    display:grid;
+    grid-template-columns:minmax(280px,.7fr) minmax(360px,1.3fr);
+    gap:18px;
+  }
+
+  .skip-controls h2,.skip-sequence h2{margin-top:0}
+
+  .step-picks{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:8px;
+  }
+
+  .step-picks button{
+    min-height:56px;
+    background:#f7f8f8;
+    border-color:var(--line);
+  }
+
+  .step-picks button[aria-pressed="true"]{
+    background:#263238;
+    color:#fff;
+  }
+
+  .skip-buttons{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:16px;
+  }
+
+  .skip-buttons button:first-child{
+    background:var(--accent);
+    color:#fff;
+  }
+
+  .skip-buttons button:last-child{
+    background:#fff;
+    border-color:var(--line);
+  }
+
+  .sequence{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-content:flex-start;
+    min-height:250px;
+    padding:14px;
+    border:2px dashed var(--line);
+    border-radius:18px;
+    background:#fbfcfc;
+  }
+
+  .seq-item{
+    min-width:70px;
+    min-height:62px;
+    padding:10px 14px;
+    border-radius:17px;
+    border:2px solid var(--line);
+    background:#fff;
+    display:grid;
+    place-items:center;
+    font-size:1.45rem;
+    font-weight:900;
+    transition:transform .18s ease, background .18s ease;
+  }
+
+  .seq-item.active{
+    transform:scale(1.12);
+    background:#fff2c2;
+    border-color:var(--unit-dark);
+  }
+
+  .seq-item.done{
+    background:#eef7f0;
+    border-color:#b9d4bd;
+  }
+
+  .skip-summary{
+    font-size:1.2rem;
+    font-weight:800;
+    color:var(--accent);
+    margin-bottom:12px;
+  }
+
+  button:disabled{opacity:.35;cursor:not-allowed}
+  .d-ten{color:var(--ten-dark)}
+  .d-unit{color:var(--unit-dark)}
+  .levels{display:flex;gap:8px;justify-content:center;margin-top:14px}
+  .levels button{min-height:50px;background:#f7f8f8;border-color:var(--line);padding:8px 14px}
+  .levels button[aria-pressed="true"]{background:#263238;color:#fff}
+  .line-wrap{overflow-x:auto;margin-top:14px;padding:6px;border:2px dashed var(--line);border-radius:18px;background:#fbfcfc}
+  .line-wrap svg{display:block}
+  g.arc{opacity:.15}
+  g.arc.on{opacity:1}
+  g.arc path{fill:none;stroke:var(--ten-dark);stroke-width:4;stroke-linecap:round}
+  g.arc text{fill:var(--ten-dark);font-size:15px;font-weight:900;text-anchor:middle}
+  .pt{fill:var(--unit);stroke:var(--unit-dark);stroke-width:2;opacity:.35}
+  .pt.on{opacity:1}
+
+  header{flex-wrap:wrap}
+  header .levels{margin:0}
+  .stars{font-weight:900;font-size:1.2rem}
+  .stars-box{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .reset-stars{min-height:48px;padding:7px 12px;background:#fff;border-color:var(--line);font-size:.95rem}
+  .option-line{
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    margin-top:14px;padding:12px 14px;background:#f7f9f9;
+    border:1px solid var(--line);border-radius:16px;font-weight:800
+  }
+  .option-line label{margin:0;display:flex;align-items:center;gap:10px}
+  .option-line input[type="checkbox"]{
+    width:28px;height:28px;min-height:0;padding:0;margin:0;accent-color:var(--accent)
+  }
+  .option-line input[type="number"]{
+    width:92px;min-height:48px;padding:6px 10px;text-align:center;font-weight:900
+  }
+  .option-line[hidden]{display:none}
+  .see-progress{margin-left:auto;padding:7px 11px;border-radius:999px;background:#eef7f0;border:2px solid #b9d4bd;color:#2f5e35;font-weight:900;white-space:nowrap}
+  .mascot{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:10px 14px;background:#fff;border:1px solid var(--line);border-radius:var(--radius)}
+  .mascot .owl{font-size:2.4rem}
+  .mascot p{margin:0;flex:1;font-size:1.2rem;font-weight:800}
+  .mascot button{min-height:50px;background:#f7f8f8;border-color:var(--line)}
+  .play{min-height:200px;margin-top:12px;padding:14px;display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start;border:2px dashed var(--line);border-radius:18px;background:#fbfcfc}
+  .row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .row button{flex:1;min-width:130px;background:#fff;border-color:var(--line)}
+  .row button[aria-pressed="true"]{background:#263238;color:#fff}
+  .obj{font-size:2rem;min-width:62px;padding:0;background:#fff;border-color:var(--line)}
+  .obj.seen{background:#eef7f0;border-color:var(--good);opacity:.55}
+  .choices{display:flex;gap:12px;margin-top:14px}
+  .choice{flex:1;min-height:84px;font-size:2.4rem;background:#fff;border-color:var(--ten-dark)}
+  .choice:disabled{opacity:.25}
+  .blocks{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+  .rod{display:grid;grid-template-rows:repeat(10,1fr);width:34px;height:170px;border:3px solid var(--ten-dark);border-radius:8px;overflow:hidden;background:var(--ten)}
+  .rod i{border-bottom:2px solid var(--ten-dark)}
+  .rod i:last-child{border:0}
+  .cubes{display:grid;grid-template-columns:repeat(3,30px);gap:5px}
+  .cube{width:30px;height:30px;border-radius:6px;background:var(--unit);border:3px solid var(--unit-dark)}
+  .dot.sel{outline:4px solid var(--focus);outline-offset:2px}
+  .target{font-size:4.5rem;font-weight:900;text-align:center;line-height:1}
+  .now{font-size:1.6rem;font-weight:900;margin-top:10px}
+  .big-q{font-size:5rem;font-weight:900;margin:auto}
+  .tile{min-height:46px;min-width:50px;padding:0;background:#fff;border-color:var(--line)}
+  .tile:disabled{opacity:.2}
+  .tile.logic-error{animation:logicError .42s ease}
+  @keyframes logicError{
+    0%,100%{transform:translateX(0);background:#fff}
+    25%{transform:translateX(-6px);background:#fff0f0}
+    50%{transform:translateX(6px);background:#fff0f0}
+    75%{transform:translateX(-3px);background:#fff0f0}
+  }
+
+  /* ===== v0.8.7 · Juego del camino a la piscina ===== */
+  .game-panel{padding:16px}
+  .game-top{display:grid;grid-template-columns:minmax(260px,1fr) auto;gap:14px;align-items:start;margin-bottom:12px}
+  .game-title-wrap h2{margin:0 0 5px}
+  .game-title-wrap p{margin:0;color:var(--muted);font-weight:650}
+  .game-config{display:grid;gap:8px;justify-items:end}
+  .game-speed-wrap,.game-difficulty-wrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  .game-speed-label,.game-difficulty-label{font-weight:900}
+  .game-speed,.game-difficulty,.game-controls{display:flex;gap:6px;flex-wrap:wrap}
+  .game-speed button,.game-difficulty button,.game-controls button{min-height:48px;padding:7px 12px;background:#fff;border-color:var(--line)}
+  .game-speed button[aria-pressed="true"],.game-difficulty button[aria-pressed="true"]{background:#263238;color:#fff;border-color:#263238}
+  .game-controls button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .game-prompt{min-height:78px;display:flex;align-items:center;justify-content:center;margin:10px 0 12px;padding:10px 16px;border-radius:20px;background:#fff4c7;border:3px solid #e2b52d;font-size:clamp(1.55rem,4vw,2.7rem);font-weight:950;text-align:center}
+  .game-prompt-text{text-transform:none;letter-spacing:-.02em;color:#6a4a00}
+  .game-hud{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:8px;margin-bottom:10px}
+  .game-stat{background:#f7f9f9;border:1px solid var(--line);border-radius:14px;padding:8px 10px;text-align:center}
+  .game-stat span{display:block;color:var(--muted);font-size:.82rem;font-weight:800}
+  .game-stat strong{display:block;font-size:1.25rem;margin-top:2px}
+  .game-rewards{margin:6px 0 10px;padding:10px 12px;border-radius:16px;background:#fff;border:1px solid var(--line);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .game-rewards span{font-weight:900;color:var(--muted)}
+  .game-rewards-bar{display:flex;gap:8px;flex-wrap:wrap;min-height:36px;align-items:center}
+  .reward-chip{min-width:34px;height:34px;padding:0 8px;border-radius:999px;display:grid;place-items:center;background:#fff8d8;border:2px solid #e2b52d;font-size:1.1rem;font-weight:900}
+  .reward-chip.medal{background:#eaf7ff;border-color:#5ab9f0}
+  .game-feedback{min-height:28px;text-align:center;font-size:1.15rem;font-weight:950;margin:-2px 0 6px}
+  .game-feedback.good{color:var(--good)}
+  .game-feedback.bad{color:var(--bad)}
+  .game-scene{position:relative;height:245px;overflow:hidden;border:2px solid #b9dce8;border-radius:22px;background:radial-gradient(circle at 13% 9%,rgba(255,255,255,.95) 0 20px,transparent 21px),radial-gradient(circle at 18% 9%,rgba(255,255,255,.95) 0 26px,transparent 27px),linear-gradient(#cceefa 0 54%,#b7d886 54% 100%);box-shadow:inset 0 -2px 0 rgba(0,0,0,.04)}
+  .game-scene.paused *{animation-play-state:paused !important}
+  .game-lane{position:absolute;left:0;right:0;height:132px}
+  .game-path{position:absolute;left:0;right:208px;bottom:18px;height:78px;background:#dfc08c;border-top:5px solid #aa8450;border-bottom:5px solid #aa8450}
+  .game-path::after{content:"";position:absolute;left:0;right:0;top:50%;height:4px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.8) 0 24px,transparent 24px 48px);transform:translateY(-50%)}
+  .game-trampoline{position:absolute;right:154px;bottom:47px;width:92px;height:14px;border-radius:12px;background:#5f6d73;border:3px solid #263238;transform:rotate(-5deg);transform-origin:right center;z-index:3}
+  .game-trampoline::before,.game-trampoline::after{content:"";position:absolute;width:5px;height:38px;background:#4f5b60;bottom:-36px}
+  .game-trampoline::before{left:12px;transform:rotate(10deg)}
+  .game-trampoline::after{right:12px;transform:rotate(-10deg)}
+  .game-pool{position:absolute;right:8px;bottom:0;width:178px;height:82px;border:7px solid #e8eef0;border-radius:44% 44% 28px 28px;background:repeating-radial-gradient(ellipse at 20% 20%,#c8f4ff 0 8px,#77d8ee 9px 18px);box-shadow:0 5px 0 #95a4aa;z-index:1}
+  .game-pool::after{content:"";position:absolute;left:15px;right:15px;top:15px;height:3px;background:rgba(255,255,255,.8);border-radius:50%}
+  .game-runner{
+    position:absolute;left:-84px;bottom:56px;width:72px;min-height:82px;padding:0;
+    border:0;background:transparent;z-index:5;cursor:pointer;
+    transform:translate3d(0,0,0);
+    will-change:transform;
+    backface-visibility:hidden;
+    animation-name:gameWalk;animation-timing-function:linear;animation-fill-mode:forwards
+  }
+  .runner-card{
+    width:72px;min-height:82px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:1px;
+    border-radius:20px;background:#fff;border:3px solid #536269;
+    box-shadow:0 5px 12px rgba(0,0,0,.16);pointer-events:none
+  }
+  .runner-face{font-size:2rem;line-height:1}
+  .runner-number{
+    display:grid;place-items:center;min-width:42px;height:34px;padding:0 6px;
+    border-radius:12px;background:#fff2bd;border:2px solid var(--unit-dark);
+    font-size:1.55rem;font-weight:950;line-height:1
+  }
+  .runner-card.wrong{animation:gameWrong .38s ease}
+  .runner-card.happy{animation:gameHappy .75s ease forwards}
+  .game-runner.diving{animation:gameDive .78s ease-in forwards}
+  @keyframes gameWalk{from{transform:translate3d(0,0,0)}to{transform:translate3d(var(--travel-x),0,0)}}
+  @keyframes gameWrong{
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-9px) rotate(-4deg)}
+    40%{transform:translateX(9px) rotate(4deg)}
+    60%{transform:translateX(-7px) rotate(-3deg)}
+    80%{transform:translateX(7px) rotate(3deg)}
+  }
+  @keyframes gameHappy{
+    0%{transform:translateY(0) rotate(0) scale(1)}
+    45%{transform:translateY(-68px) rotate(-8deg) scale(1.12)}
+    72%{transform:translateY(-20px) rotate(7deg) scale(1.07)}
+    100%{transform:translateY(0) rotate(0) scale(.92);opacity:.2}
+  }
+  @keyframes gameDive{
+    0%{transform:translate(0,0) rotate(0);opacity:1}
+    48%{transform:translate(72px,-92px) rotate(12deg);opacity:1}
+    100%{transform:translate(145px,73px) rotate(32deg);opacity:.15}
+  }
+  .game-splash,.game-burst{position:absolute;right:58px;bottom:44px;font-size:2.3rem;z-index:8;pointer-events:none}
+  .game-splash{animation:gameSplash .8s ease-out forwards}
+  .game-burst{animation:gameBurst .95s ease-out forwards}
+  .game-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .game-help{margin:0;flex:1;min-width:250px;color:var(--muted);font-weight:650}
+  @keyframes gameArmL{from{transform:rotate(16deg)}to{transform:rotate(-18deg)}}
+  @keyframes gameArmR{from{transform:rotate(-18deg)}to{transform:rotate(16deg)}}
+  @keyframes gameLegL{from{transform:rotate(18deg)}to{transform:rotate(-15deg)}}
+  @keyframes gameLegR{from{transform:rotate(-15deg)}to{transform:rotate(18deg)}}
+  @keyframes runnerFloat{from{transform:translateY(0) rotate(0deg)}to{transform:translateY(-3px) rotate(-1deg)}}
+  @keyframes gameWrong{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px) rotate(-4deg)}40%{transform:translateX(9px) rotate(4deg)}60%{transform:translateX(-7px) rotate(-3deg)}80%{transform:translateX(7px) rotate(3deg)}}
+  @keyframes gameHappy{0%{transform:translateY(0) rotate(0) scale(1)}35%{transform:translateY(-58px) rotate(-6deg) scale(1.12)}68%{transform:translateY(-18px) rotate(6deg) scale(1.08)}100%{transform:translateY(0) rotate(0) scale(.9);opacity:.15}}
+  @keyframes gameDive{0%{transform:translate(0,0) rotate(0);opacity:1}48%{transform:translate(76px,-90px) rotate(12deg);opacity:1}100%{transform:translate(152px,68px) rotate(32deg);opacity:.08}}
+  @keyframes gameSplash{0%{transform:scale(.4);opacity:0}30%{transform:scale(1.25);opacity:1}100%{transform:scale(1.6);opacity:0}}
+  @keyframes gameBurst{0%{transform:translateY(12px) scale(.6);opacity:0}20%{transform:translateY(-8px) scale(1.15);opacity:1}100%{transform:translateY(-42px) scale(1.5);opacity:0}}
+
+  @media (max-width:850px){
+    .grid,.skip-layout{grid-template-columns:1fr}
+    .game-top{grid-template-columns:1fr}
+    .game-config{justify-items:start}
+    .game-speed-wrap,.game-difficulty-wrap{justify-content:flex-start}
+    .game-hud{grid-template-columns:repeat(2,1fr)}
+  }
+
+  @media (max-width:560px){
+    .app{padding:10px}
+    .panel{padding:14px}
+    .controls{grid-template-columns:repeat(2,1fr)}
+    .bottom-actions{grid-template-columns:1fr}
+    .inline{grid-template-columns:1fr}
+    .step-picks{grid-template-columns:repeat(2,1fr)}
+    .game-scene{height:320px}
+    .game-runner{width:62px;min-height:74px;bottom:54px}
+    .runner-card{width:62px;min-height:74px}
+    .runner-face{font-size:1.65rem}
+    .runner-number{min-width:38px;height:31px;font-size:1.35rem}
+    .game-pool{width:145px;height:80px}
+    .game-trampoline{right:126px;width:78px}
+    .game-path{right:175px}
+    .game-hud{grid-template-columns:repeat(2,1fr)}
+    .units-grid{
+      grid-template-columns:repeat(10, 30px);
+      gap:5px;
+    }
+    .dot{
+      width:30px;
+      height:30px;
+      border-width:2px;
+    }
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{
+      scroll-behavior:auto!important;
+      transition:none!important;
+      animation:none!important;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1 data-i18n="appTitle">🔢 Descubrimos los números</h1>
+    <div id="levels" class="levels" role="group" aria-label="Hasta qué número jugamos" data-i18n-aria="levelsAria">
+      <button type="button" data-max="10" aria-pressed="true">0–10</button>
+      <button type="button" data-max="20" aria-pressed="false">0–20</button>
+      <button type="button" data-max="99" aria-pressed="false">0–99</button>
+    </div>
+    <div class="stars-box" aria-label="Estrellas conseguidas" data-i18n-aria="starsAria">
+      <span id="stars" class="stars" aria-live="polite">⭐ 0</span>
+      <button id="resetStarsBtn" class="reset-stars" type="button" data-i18n="resetStars" data-i18n-title="resetStarsTitle">↺ Reiniciar</button>
+    </div>
+    <div class="sound-language">
+      <button id="soundBtn" class="sound" type="button" aria-pressed="true">🔊 Sonido</button>
+      <div class="language-picker" role="group" aria-label="Idioma" data-i18n-aria="languageAria">
+        <span class="language-label" data-i18n="language">Idioma</span>
+        <div class="language-buttons">
+          <button type="button" data-lang="es" aria-pressed="true">Castellano</button>
+          <button type="button" data-lang="va" aria-pressed="false">Valencià</button>
+          <button type="button" data-lang="en" aria-pressed="false">English</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Modos" data-i18n-aria="modesAria">
+    <button id="exploreTab" role="tab" type="button" aria-selected="true" data-i18n="tabExplore">Explorar números</button>
+    <button id="skipTab" role="tab" type="button" aria-selected="false" data-i18n="tabSkip">Contar a saltos</button>
+    <button id="countTab" role="tab" type="button" aria-selected="false" data-i18n="tabCount">Cuenta objetos</button>
+    <button id="buildTab" role="tab" type="button" aria-selected="false" data-i18n="tabBuild">Construye</button>
+    <button id="groupTab" role="tab" type="button" aria-selected="false" data-i18n="tabGroup">Grupos de diez</button>
+    <button id="guessTab" role="tab" type="button" aria-selected="false" data-i18n="tabGuess">Adivina</button>
+    <button id="gameTab" role="tab" type="button" aria-selected="false" data-i18n="tabGame">Juego</button>
+  </nav>
+
+  <div class="mascot"><span class="owl" aria-hidden="true">🦉</span><p id="say" aria-live="polite"></p><button id="sayAgain" type="button" aria-label="Repetir" data-i18n-aria="repeatAria">🔊</button></div>
+
+  <main>
+    <section id="exploreMode" class="mode active">
+      <div class="grid">
+        <section class="panel number-card" aria-label="Número actual" data-i18n-aria="currentNumberAria">
+          <div id="bigNumber" class="big-number" aria-live="polite">5</div>
+          <div id="numberWord" class="word">cinco</div>
+          <div id="decomposition" class="decomp">5 unidades</div>
+
+          <div class="controls" aria-label="Cambiar número" data-i18n-aria="changeNumberAria">
+            <button type="button" data-change="-10">−10</button>
+            <button type="button" data-change="-1">−1</button>
+            <button type="button" data-change="1" class="primary">+1</button>
+            <button type="button" data-change="10">+10</button>
+          </div>
+
+          <div class="field-group">
+            <label for="numberInput"><span data-i18n="writeNumber">Escribe un número</span> (<span id="maxLbl">0–10</span>)</label>
+            <div class="inline">
+              <input id="numberInput" type="number" min="0" max="99" inputmode="numeric" value="5">
+              <button id="showNumberBtn" type="button" data-i18n="show">Mostrar</button>
+            </div>
+            <p class="helper" data-i18n="keyboardHelp">También puedes usar directamente el teclado numérico.</p>
+          </div>
+
+          <div class="field-group">
+            <label for="wordInput" data-i18n="writeWords">Escribe el número con letras</label>
+            <div class="inline">
+              <input id="wordInput" type="text" autocomplete="off" spellcheck="false" placeholder="por ejemplo: diecisiete" data-i18n-placeholder="wordPlaceholder">
+              <button id="showWordBtn" type="button" data-i18n="search">Buscar</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" aria-label="Representación visual" data-i18n-aria="visualAria">
+          <div class="visual-head">
+            <h2 data-i18n="visualTitle">Así se ve el número</h2>
+            <div class="view-buttons">
+              <button id="unitsViewBtn" type="button" aria-pressed="true" data-i18n="viewUnits">● Unidades</button>
+              <button id="groupsViewBtn" type="button" aria-pressed="false" data-i18n="viewTens">▰ Decenas</button>
+              <button id="framesViewBtn" type="button" aria-pressed="false" data-i18n="viewFrames">▦ Marcos de 10</button>
+              <button id="rodsViewBtn" type="button" aria-pressed="false" data-i18n="viewRods">▮ Barras</button>
+            </div>
+          </div>
+
+          <div id="objects" class="objects"></div>
+
+          <div class="bottom-actions">
+            <button id="countBtn" type="button" data-i18n="countSlow">👆 Contar despacio</button>
+            <button id="speakBtn" type="button" data-i18n="listenNumber">🔊 Escuchar número</button>
+            <button id="randomBtn" type="button" data-i18n="anotherNumber">🎲 Otro número</button>
+          </div>
+
+          <div id="status" class="status" aria-live="polite" data-i18n="initialStatus">Pulsa una ficha para contarla.</div>
+        </section>
+      </div>
+    </section>
+
+    <section id="skipMode" class="mode">
+      <div class="skip-layout">
+        <section class="panel skip-controls">
+          <h2 data-i18n="skipTitle">Contar a saltos</h2>
+
+          <div class="field-group">
+            <label for="startInput" data-i18n="startAt">Empezamos en</label>
+            <input id="startInput" type="number" min="0" max="99" inputmode="numeric" value="0">
+          </div>
+
+          <div class="field-group">
+            <label data-i18n="jumpBy">Saltamos de...</label>
+            <div id="stepPicks" class="step-picks">
+              <button type="button" data-step="1" aria-pressed="false">1 en 1</button>
+              <button type="button" data-step="2" aria-pressed="true">2 en 2</button>
+              <button type="button" data-step="3" aria-pressed="false">3 en 3</button>
+              <button type="button" data-step="4" aria-pressed="false">4 en 4</button>
+              <button type="button" data-step="5" aria-pressed="false">5 en 5</button>
+              <button type="button" data-step="6" aria-pressed="false">6 en 6</button>
+              <button type="button" data-step="7" aria-pressed="false">7 en 7</button>
+              <button type="button" data-step="8" aria-pressed="false">8 en 8</button>
+              <button type="button" data-step="9" aria-pressed="false">9 en 9</button>
+              <button type="button" data-step="10" aria-pressed="false">10 en 10</button>
+            </div>
+          </div>
+
+          <div class="skip-buttons">
+            <button id="startSkipBtn" type="button" data-i18n="start">▶ Empezar</button>
+            <button id="stopSkipBtn" type="button" data-i18n="stop">■ Parar</button>
+          </div>
+
+          <p class="helper" data-i18n="skipHelp">La secuencia continúa hasta 99. Puedes detenerla en cualquier momento.</p>
+        </section>
+
+        <section class="panel skip-sequence">
+          <h2 data-i18n="seriesTitle">La serie</h2>
+          <div id="skipSummary" class="skip-summary">Desde 0, de 2 en 2</div>
+          <div id="sequence" class="sequence" aria-live="polite"></div>
+          <div id="line" class="line-wrap"></div>
+          <div id="skipStatus" class="status" data-i18n="skipInitial">Pulsa «Empezar» para escuchar y seguir la serie.</div>
+        </section>
+      </div>
+    </section>
+    <section id="countMode" class="mode"><section class="panel">
+      <h2 data-i18n="countObjectsTitle">Cuenta los objetos</h2>
+      <div id="cArea" class="play"></div><div id="cChoices" class="choices"></div>
+    </section></section>
+
+    <section id="buildMode" class="mode"><section class="panel">
+      <h2 data-i18n="buildTitle">Construye el número</h2>
+      <div id="bTarget" class="target"></div>
+      <div id="bArea" class="play"></div>
+      <div class="option-line">
+        <label for="bHideCount">
+          <input id="bHideCount" type="checkbox">
+          <span data-i18n="hideCount">Ocultar cuántas llevo</span>
+        </label>
+      </div>
+      <div id="bNowLine" class="now"><span data-i18n="youHave">Llevas</span>: <span id="bNow"></span></div>
+      <div class="row">
+        <button id="bTen" type="button" data-i18n="addTenRod">+ barra de 10</button>
+        <button id="bOne" type="button" data-i18n="addCube">+ cubito</button>
+        <button id="bUndo" type="button" data-i18n="remove">↩ Quitar</button>
+        <button id="bOk" type="button" data-i18n="check">✔ Comprobar</button>
+      </div>
+    </section></section>
+
+    <section id="groupMode" class="mode"><section class="panel">
+      <h2 data-i18n="groupTitle">Haz grupos de diez</h2>
+      <div id="gLoose" class="play"></div>
+      <div class="row"><button id="gBtn" type="button" data-i18n="groupSelected">📦 Agrupar las 10 elegidas</button></div>
+      <div id="gGroups" class="play" style="min-height:120px"></div>
+      <div id="gChoices" class="choices"></div>
+    </section></section>
+
+    <section id="guessMode" class="mode"><section class="panel">
+      <h2 data-i18n="guessTitle">Adivina el número</h2>
+      <div id="uSel" class="row">
+        <button type="button" data-g="hear" aria-pressed="true" data-i18n="guessHear">👂 Lo oigo</button>
+        <button type="button" data-g="see" aria-pressed="false" data-i18n="guessSee">👀 Lo veo</button>
+        <button type="button" data-g="more" aria-pressed="false" data-i18n="guessMoreLess">🔎 Más o menos</button>
+      </div>
+      <div id="uSeeSettings" class="option-line" hidden>
+        <label for="uSeeSeconds" data-i18n="hintVisibleTime">Tiempo visible de la pista:</label>
+        <input id="uSeeSeconds" type="number" min="0.5" max="15" step="0.5" value="2.5" inputmode="decimal" aria-label="Segundos que será visible la pista" data-i18n-aria="hintSecondsAria">
+        <span data-i18n="seconds">segundos</span>
+        <span id="uSeeProgress" class="see-progress" aria-live="polite"></span>
+      </div>
+      <div id="uArea" class="play"></div><div id="uChoices" class="choices"></div>
+    </section></section>
+
+    <section id="gameMode" class="mode"><section class="panel game-panel">
+      <div class="game-top">
+        <div class="game-title-wrap">
+          <h2 data-i18n="gameTitle">Camino a la piscina</h2>
+          <p data-i18n="gameIntro">Haz clic en el muñeco con el número que te pido antes de que salte a la piscina.</p>
+        </div>
+        <div class="game-config">
+          <div class="game-speed-wrap">
+            <span class="game-speed-label" data-i18n="gameSpeed">Velocidad</span>
+            <div id="gameSpeed" class="game-speed" role="group" aria-label="Velocidad" data-i18n-aria="gameSpeedAria">
+              <button type="button" data-game-speed="slow" aria-pressed="false" data-i18n="gameSlow">Despacio</button>
+              <button type="button" data-game-speed="normal" aria-pressed="true" data-i18n="gameNormal">Normal</button>
+              <button type="button" data-game-speed="fast" aria-pressed="false" data-i18n="gameFast">Rápido</button>
+            </div>
+          </div>
+          <div class="game-difficulty-wrap">
+            <span class="game-difficulty-label">Caminos</span>
+            <div id="gameDifficulty" class="game-difficulty" role="group" aria-label="Caminos">
+              <button type="button" data-game-difficulty="easy" aria-pressed="true">Fácil · 1</button>
+              <button type="button" data-game-difficulty="medium" aria-pressed="false">Medio · 2</button>
+              <button type="button" data-game-difficulty="hard" aria-pressed="false">Difícil · 3</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-prompt" aria-live="polite"><span id="gamePrompt" class="game-prompt-text"></span></div>
+      <div class="game-hud">
+        <div class="game-stat"><span data-i18n="gamePoints">Puntos</span><strong id="gameScore">0</strong></div>
+        <div class="game-stat"><span data-i18n="gameRange">Rango actual</span><strong id="gameRange">0–10</strong></div>
+        <div class="game-stat"><span data-i18n="gameAccuracy">Precisión reciente</span><strong id="gameAccuracy">—</strong></div>
+        <div class="game-stat"><span data-i18n="gameRate">Aciertos/min</span><strong id="gameRate">—</strong></div>
+      </div>
+      <div class="game-rewards"><span>Recompensas</span><div id="gameRewardsBar" class="game-rewards-bar" aria-live="polite"></div></div>
+      <div id="gameFeedback" class="game-feedback" aria-live="polite"></div>
+      <div id="gameScene" class="game-scene" aria-label="Camino, trampolín y piscina" data-i18n-aria="gameSceneAria"></div>
+      <div class="game-actions">
+        <div class="game-controls" role="group" aria-label="Controles del juego">
+          <button id="gameStart" type="button" class="primary">▶ Iniciar</button>
+          <button id="gamePause" type="button">⏸ Pausa</button>
+          <button id="gameEnd" type="button">■ Terminar</button>
+        </div>
+        <p class="game-help" data-i18n="gameAdaptiveHelp">El rango aumenta automáticamente cuando mantienes una precisión alta y respondes con rapidez.</p>
+      </div>
+    </section></section>
+  </main>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const state = {
+    number: 5,
+    max: 10,
+    mode: "explore",
+    line: null,
+    view: "units",
+    sound: true,
+    counting: false,
+    countToken: 0,
+    skipStep: 2,
+    skipToken: 0,
+    keyboardBuffer: "",
+    keyboardTimer: null,
+    lang: "es"
+  };
+
+  const $ = id => document.getElementById(id);
+
+  const el = {
+    bigNumber:$("bigNumber"),
+    numberWord:$("numberWord"),
+    decomposition:$("decomposition"),
+    numberInput:$("numberInput"),
+    wordInput:$("wordInput"),
+    objects:$("objects"),
+    status:$("status"),
+    soundBtn:$("soundBtn"),
+    unitsViewBtn:$("unitsViewBtn"),
+    groupsViewBtn:$("groupsViewBtn"),
+    framesViewBtn:$("framesViewBtn"),
+    countBtn:$("countBtn"),
+    speakBtn:$("speakBtn"),
+    randomBtn:$("randomBtn"),
+    showNumberBtn:$("showNumberBtn"),
+    showWordBtn:$("showWordBtn"),
+    exploreTab:$("exploreTab"),
+    skipTab:$("skipTab"),
+    exploreMode:$("exploreMode"),
+    skipMode:$("skipMode"),
+    startInput:$("startInput"),
+    stepPicks:$("stepPicks"),
+    startSkipBtn:$("startSkipBtn"),
+    stopSkipBtn:$("stopSkipBtn"),
+    skipSummary:$("skipSummary"),
+    sequence:$("sequence"),
+    skipStatus:$("skipStatus"),
+    line:$("line"),
+    levels:$("levels"),
+    maxLbl:$("maxLbl")
+  };
+
+  const LANG_INFO = {
+    es:{html:"es",tts:"es-ES"},
+    va:{html:"ca",tts:"ca-ES"},
+    en:{html:"en",tts:"en-GB"}
+  };
+
+  const TEXT = {
+    es:{
+      docTitle:"Números para Infantil · v0.8.12",
+      appTitle:"🔢 Descubrimos los números",
+      levelsAria:"Hasta qué número jugamos",
+      starsAria:"Estrellas conseguidas",
+      resetStars:"↺ Reiniciar",
+      resetStarsTitle:"Reiniciar estrellas",
+      language:"Idioma",
+      languageAria:"Seleccionar idioma",
+      modesAria:"Modos",
+      tabExplore:"Explorar números",
+      tabSkip:"Contar a saltos",
+      tabCount:"Cuenta objetos",
+      tabBuild:"Construye",
+      tabGroup:"Grupos de diez",
+      tabGuess:"Adivina",
+      tabGame:"Juego",
+      repeatAria:"Repetir",
+      currentNumberAria:"Número actual",
+      changeNumberAria:"Cambiar número",
+      writeNumber:"Escribe un número",
+      show:"Mostrar",
+      keyboardHelp:"También puedes usar directamente el teclado numérico.",
+      writeWords:"Escribe el número con letras",
+      wordPlaceholder:"por ejemplo: diecisiete",
+      search:"Buscar",
+      visualAria:"Representación visual",
+      visualTitle:"Así se ve el número",
+      viewUnits:"● Unidades",
+      viewTens:"▰ Decenas",
+      viewFrames:"▦ Marcos de 10",
+      viewRods:"▮ Barras",
+      countSlow:"👆 Contar despacio",
+      listenNumber:"🔊 Escuchar número",
+      anotherNumber:"🎲 Otro número",
+      initialStatus:"Pulsa una ficha para contarla.",
+      skipTitle:"Contar a saltos",
+      startAt:"Empezamos en",
+      jumpBy:"Saltamos de...",
+      start:"▶ Empezar",
+      stop:"■ Parar",
+      skipHelp:"La secuencia continúa hasta 99. Puedes detenerla en cualquier momento.",
+      seriesTitle:"La serie",
+      skipInitial:"Pulsa «Empezar» para escuchar y seguir la serie.",
+      countObjectsTitle:"Cuenta los objetos",
+      buildTitle:"Construye el número",
+      hideCount:"Ocultar cuántas llevo",
+      youHave:"Llevas",
+      addTenRod:"+ barra de 10",
+      addCube:"+ cubito",
+      remove:"↩ Quitar",
+      check:"✔ Comprobar",
+      groupTitle:"Haz grupos de diez",
+      groupSelected:"📦 Agrupar las 10 elegidas",
+      guessTitle:"Adivina el número",
+      guessHear:"👂 Lo oigo",
+      guessSee:"👀 Lo veo",
+      guessMoreLess:"🔎 Más o menos",
+      hintVisibleTime:"Tiempo visible de la pista:",
+      hintSecondsAria:"Segundos que será visible la pista",
+      seconds:"segundos",
+      soundOn:"🔊 Sonido",
+      soundOff:"🔇 Silencio",
+      soundOnStatus:"Sonido activado.",
+      soundOffStatus:"Sonido desactivado.",
+      step:"{n} en {n}",
+      unit:"unidad", units:"unidades",
+      ten:"decena", tens:"decenas",
+      counter:"ficha", counters:"fichas",
+      looseUnits:"unidades sueltas",
+      tenGroupAria:"Decena {g}: diez unidades",
+      tenGroupTitle:"1 decena = 10",
+      frameAria:"Marco de diez {n}",
+      zeroMeaning:"Cero significa que no hay ninguna ficha.",
+      rowTen:"Cada fila completa tiene 10 fichas.",
+      dotAria:"Ficha {n}",
+      upToHere:"Hasta aquí hay {n}: {word}.",
+      zeroEmpty:"Aquí no hay fichas.<br>Eso representa el número 0.",
+      zeroGroups:"0 decenas · 0 unidades",
+      zeroFrame:"El marco está vacío porque tenemos 0.",
+      zeroRods:"0 barras · 0 cubitos",
+      noCountZero:"No contamos fichas: tenemos cero.",
+      countFinish:"¡Hay {n}!",
+      invalidNumber:"Escribe un número entre 0 y {max}.",
+      wordOk:"Sí: «{word}» es {n}.",
+      wordUnknown:"Todavía no reconozco esa palabra. Prueba con un número del cero al {maxWord}.",
+      skipSummary:"Desde {start}, de {step} en {step}{tensNote}",
+      tensNote:" (por decenas)",
+      sequencePrepared:"Serie preparada: {n} números.",
+      numberLineAria:"Recta numérica con los saltos",
+      seriesFinished:"¡Serie terminada!",
+      seriesStopped:"Serie detenida.",
+      exploreSay:"Toca las fichas y escucha.",
+      skipSay:"Elige cómo saltar y pulsa Empezar.",
+      veryGood:"¡Muy bien! 🎉",
+      alreadyCounted:"Ese ya lo has contado 😉",
+      howMany:"¿Cuántos hay?",
+      countHint:"Mira el último número que has dicho. Prueba otra vez.",
+      countReveal:"Hay {n}: {word}.",
+      countInstruction:"Toca cada uno una sola vez y cuenta.",
+      buildPrompt:"Construye el {n}",
+      tenCubesToRod:"¡10 cubitos! Los cambiamos por 1 barra.",
+      missing:"Te faltan {n}.",
+      extra:"Te sobran {n}.",
+      buildReveal:"{t}: {d} {bars} y {u} {cubes}.",
+      bar:"barra", bars:"barras",
+      cube:"cubito", cubes:"cubitos",
+      chooseTen:"Elige 10 fichas y pulsa «Agrupar».",
+      selectedMissing:"Tienes {have}. Faltan {n} para 10.",
+      selectedExtra:"Tienes {have}. Sobran {n}.",
+      groupsKeep:"¡{g} {word}! Sigue.",
+      noMoreGroups:"Ya no caben más grupos. ¿Cuántas fichas hay en total?",
+      groupHint:"Cuenta de diez en diez y luego las sueltas.",
+      groupReveal:"Hay {g} grupos de diez y {left} fichas sueltas: {t}, {word}.",
+      tryAgain:"Prueba otra vez.",
+      wasNumber:"Era el {n}: {word}.",
+      whatHear:"¿Qué número escuchas?",
+      lookCarefully:"Mira bien…",
+      howManyWere:"¿Cuántas fichas había?",
+      seeWhatNumber:"¿Qué número has visto?",
+      seeProgress:"Nivel hasta {max} · Racha {streak}/{goal}",
+      seeLevelUp:"¡Muy bien! Ahora Lo veo llega hasta {max}.",
+      guessed:"¡Lo has adivinado! 🎉",
+      bigger:"Es más grande ⬆️",
+      smaller:"Es más pequeño ⬇️",
+      thinking:"Estoy pensando en un número. ¡Adivínalo!",
+      moreLogicLow:"Recuerda: te dije que era más grande que {bound}. {v} no puede ser. Elige un número mayor que {bound}.",
+      moreLogicHigh:"Recuerda: te dije que era más pequeño que {bound}. {v} no puede ser. Elige un número menor que {bound}.",
+      resetConfirm:"¿Quieres reiniciar el contador de estrellas a 0?",
+      resetDone:"Contador de estrellas reiniciado.",
+      gameTitle:"Camino a la piscina",
+      gameIntro:"Haz clic en el muñeco con el número que te pido antes de que salte a la piscina.",
+      gameSpeed:"Velocidad",
+      gameSpeedAria:"Seleccionar velocidad del juego",
+      gameSlow:"Despacio",
+      gameNormal:"Normal",
+      gameFast:"Rápido",
+      gamePoints:"Puntos",
+      gameRange:"Rango actual",
+      gameAccuracy:"Precisión reciente",
+      gameRate:"Aciertos/min",
+      gameSceneAria:"Camino con muñecos que avanzan hacia un trampolín y una piscina",
+      gameAdaptiveHelp:"El rango aumenta automáticamente cuando mantienes una precisión alta y respondes con rapidez.",
+      gameRestart:"↻ Nueva partida",
+      gameFind:"Busca: {word}",
+      gameFindSpeech:"Busca el {word}.",
+      gameWrong:"No. Busca el {word}.",
+      gameLevelUp:"¡Genial! Ahora aparecen números hasta {max}.",
+      gameRunnerAria:"Muñeco con el número {n}",
+      gameMiss:"Se ha tirado a la piscina. Vamos con otro.",
+      gameCorrect:"+1",
+      gameError:"−1",
+      hello:"¡Hola! Toca las fichas y escucha."
+    },
+
+    va:{
+      docTitle:"Nombres per a Infantil · v0.8.12",
+      appTitle:"🔢 Descobrim els nombres",
+      levelsAria:"Fins a quin nombre juguem",
+      starsAria:"Estreles aconseguides",
+      resetStars:"↺ Reiniciar",
+      resetStarsTitle:"Reiniciar les estreles",
+      language:"Idioma",
+      languageAria:"Seleccionar idioma",
+      modesAria:"Modes",
+      tabExplore:"Explorar nombres",
+      tabSkip:"Comptar a salts",
+      tabCount:"Compta objectes",
+      tabBuild:"Construïx",
+      tabGroup:"Grups de deu",
+      tabGuess:"Endevina",
+      tabGame:"Joc",
+      repeatAria:"Repetir",
+      currentNumberAria:"Nombre actual",
+      changeNumberAria:"Canviar el nombre",
+      writeNumber:"Escriu un nombre",
+      show:"Mostrar",
+      keyboardHelp:"També pots usar directament el teclat numèric.",
+      writeWords:"Escriu el nombre amb lletres",
+      wordPlaceholder:"per exemple: dèsset",
+      search:"Buscar",
+      visualAria:"Representació visual",
+      visualTitle:"Així es veu el nombre",
+      viewUnits:"● Unitats",
+      viewTens:"▰ Desenes",
+      viewFrames:"▦ Marcs de 10",
+      viewRods:"▮ Barres",
+      countSlow:"👆 Comptar a poc a poc",
+      listenNumber:"🔊 Escoltar el nombre",
+      anotherNumber:"🎲 Un altre nombre",
+      initialStatus:"Prem una fitxa per a comptar-la.",
+      skipTitle:"Comptar a salts",
+      startAt:"Comencem en",
+      jumpBy:"Saltem de...",
+      start:"▶ Començar",
+      stop:"■ Parar",
+      skipHelp:"La seqüència continua fins a 99. Pots detindre-la en qualsevol moment.",
+      seriesTitle:"La sèrie",
+      skipInitial:"Prem «Començar» per a escoltar i seguir la sèrie.",
+      countObjectsTitle:"Compta els objectes",
+      buildTitle:"Construïx el nombre",
+      hideCount:"Ocultar quantes en porte",
+      youHave:"En portes",
+      addTenRod:"+ barra de 10",
+      addCube:"+ cubet",
+      remove:"↩ Llevar",
+      check:"✔ Comprovar",
+      groupTitle:"Fes grups de deu",
+      groupSelected:"📦 Agrupar les 10 triades",
+      guessTitle:"Endevina el nombre",
+      guessHear:"👂 L'escolte",
+      guessSee:"👀 El veig",
+      guessMoreLess:"🔎 Més o menys",
+      hintVisibleTime:"Temps visible de la pista:",
+      hintSecondsAria:"Segons que serà visible la pista",
+      seconds:"segons",
+      soundOn:"🔊 So",
+      soundOff:"🔇 Silenci",
+      soundOnStatus:"So activat.",
+      soundOffStatus:"So desactivat.",
+      step:"{n} en {n}",
+      unit:"unitat", units:"unitats",
+      ten:"desena", tens:"desenes",
+      counter:"fitxa", counters:"fitxes",
+      looseUnits:"unitats soltes",
+      tenGroupAria:"Desena {g}: deu unitats",
+      tenGroupTitle:"1 desena = 10",
+      frameAria:"Marc de deu {n}",
+      zeroMeaning:"Zero significa que no hi ha cap fitxa.",
+      rowTen:"Cada fila completa té 10 fitxes.",
+      dotAria:"Fitxa {n}",
+      upToHere:"Fins ací n'hi ha {n}: {word}.",
+      zeroEmpty:"Ací no hi ha fitxes.<br>Això representa el nombre 0.",
+      zeroGroups:"0 desenes · 0 unitats",
+      zeroFrame:"El marc està buit perquè tenim 0.",
+      zeroRods:"0 barres · 0 cubets",
+      noCountZero:"No comptem fitxes: tenim zero.",
+      countFinish:"N'hi ha {n}!",
+      invalidNumber:"Escriu un nombre entre 0 i {max}.",
+      wordOk:"Sí: «{word}» és {n}.",
+      wordUnknown:"Encara no reconec eixa paraula. Prova amb un nombre del zero al {maxWord}.",
+      skipSummary:"Des de {start}, de {step} en {step}{tensNote}",
+      tensNote:" (per desenes)",
+      sequencePrepared:"Sèrie preparada: {n} nombres.",
+      numberLineAria:"Recta numèrica amb els salts",
+      seriesFinished:"Sèrie acabada!",
+      seriesStopped:"Sèrie parada.",
+      exploreSay:"Toca les fitxes i escolta.",
+      skipSay:"Tria com saltar i prem Començar.",
+      veryGood:"Molt bé! 🎉",
+      alreadyCounted:"Eixa ja l'has comptada 😉",
+      howMany:"Quants n'hi ha?",
+      countHint:"Mira l'últim nombre que has dit. Prova una altra vegada.",
+      countReveal:"N'hi ha {n}: {word}.",
+      countInstruction:"Toca cada objecte una sola vegada i compta.",
+      buildPrompt:"Construïx el {n}",
+      tenCubesToRod:"10 cubets! Els canviem per 1 barra.",
+      missing:"Te'n falten {n}.",
+      extra:"Te'n sobren {n}.",
+      buildReveal:"{t}: {d} {bars} i {u} {cubes}.",
+      bar:"barra", bars:"barres",
+      cube:"cubet", cubes:"cubets",
+      chooseTen:"Tria 10 fitxes i prem «Agrupar».",
+      selectedMissing:"En tens {have}. En falten {n} per a 10.",
+      selectedExtra:"En tens {have}. En sobren {n}.",
+      groupsKeep:"{g} {word}! Continua.",
+      noMoreGroups:"Ja no caben més grups. Quantes fitxes hi ha en total?",
+      groupHint:"Compta de deu en deu i després les que queden soltes.",
+      groupReveal:"Hi ha {g} grups de deu i {left} fitxes soltes: {t}, {word}.",
+      tryAgain:"Prova una altra vegada.",
+      wasNumber:"Era el {n}: {word}.",
+      whatHear:"Quin nombre escoltes?",
+      lookCarefully:"Mira bé…",
+      howManyWere:"Quantes fitxes hi havia?",
+      seeWhatNumber:"Quin nombre has vist?",
+      seeProgress:"Nivell fins a {max} · Ratxa {streak}/{goal}",
+      seeLevelUp:"Molt bé! Ara El veig arriba fins a {max}.",
+      guessed:"L'has endevinat! 🎉",
+      bigger:"És més gran ⬆️",
+      smaller:"És més xicotet ⬇️",
+      thinking:"Estic pensant en un nombre. Endevina'l!",
+      moreLogicLow:"Recorda: t'he dit que era més gran que {bound}. {v} no pot ser. Tria un nombre més gran que {bound}.",
+      moreLogicHigh:"Recorda: t'he dit que era més xicotet que {bound}. {v} no pot ser. Tria un nombre més xicotet que {bound}.",
+      resetConfirm:"Vols reiniciar el comptador d'estreles a 0?",
+      resetDone:"Comptador d'estreles reiniciat.",
+      gameTitle:"Camí a la piscina",
+      gameIntro:"Fes clic en el ninot amb el nombre que et demane abans que salte a la piscina.",
+      gameSpeed:"Velocitat",
+      gameSpeedAria:"Seleccionar la velocitat del joc",
+      gameSlow:"A poc a poc",
+      gameNormal:"Normal",
+      gameFast:"Ràpid",
+      gamePoints:"Punts",
+      gameRange:"Rang actual",
+      gameAccuracy:"Precisió recent",
+      gameRate:"Encerts/min",
+      gameSceneAria:"Camí amb ninots que avancen cap a un trampolí i una piscina",
+      gameAdaptiveHelp:"El rang augmenta automàticament quan mantens una precisió alta i respons amb rapidesa.",
+      gameRestart:"↻ Nova partida",
+      gameFind:"Busca: {word}",
+      gameFindSpeech:"Busca el {word}.",
+      gameWrong:"No. Busca el {word}.",
+      gameLevelUp:"Molt bé! Ara apareixen nombres fins al {max}.",
+      gameRunnerAria:"Ninot amb el nombre {n}",
+      gameMiss:"S'ha tirat a la piscina. Anem amb un altre.",
+      gameCorrect:"+1",
+      gameError:"−1",
+      hello:"Hola! Toca les fitxes i escolta."
+    },
+
+    en:{
+      docTitle:"Numbers for Early Years · v0.8.12",
+      appTitle:"🔢 Discovering numbers",
+      levelsAria:"Choose the highest number",
+      starsAria:"Stars earned",
+      resetStars:"↺ Reset",
+      resetStarsTitle:"Reset stars",
+      language:"Language",
+      languageAria:"Select language",
+      modesAria:"Modes",
+      tabExplore:"Explore numbers",
+      tabSkip:"Skip counting",
+      tabCount:"Count objects",
+      tabBuild:"Build",
+      tabGroup:"Groups of ten",
+      tabGuess:"Guess",
+      tabGame:"Game",
+      repeatAria:"Repeat",
+      currentNumberAria:"Current number",
+      changeNumberAria:"Change number",
+      writeNumber:"Type a number",
+      show:"Show",
+      keyboardHelp:"You can also use the numeric keypad directly.",
+      writeWords:"Write the number in words",
+      wordPlaceholder:"for example: seventeen",
+      search:"Find",
+      visualAria:"Visual representation",
+      visualTitle:"This is what the number looks like",
+      viewUnits:"● Units",
+      viewTens:"▰ Tens",
+      viewFrames:"▦ Ten frames",
+      viewRods:"▮ Rods",
+      countSlow:"👆 Count slowly",
+      listenNumber:"🔊 Hear number",
+      anotherNumber:"🎲 Another number",
+      initialStatus:"Press a counter to count it.",
+      skipTitle:"Skip counting",
+      startAt:"Start at",
+      jumpBy:"Count by...",
+      start:"▶ Start",
+      stop:"■ Stop",
+      skipHelp:"The sequence continues up to 99. You can stop it at any time.",
+      seriesTitle:"The sequence",
+      skipInitial:"Press «Start» to listen and follow the sequence.",
+      countObjectsTitle:"Count the objects",
+      buildTitle:"Build the number",
+      hideCount:"Hide how many I have",
+      youHave:"You have",
+      addTenRod:"+ ten rod",
+      addCube:"+ cube",
+      remove:"↩ Remove",
+      check:"✔ Check",
+      groupTitle:"Make groups of ten",
+      groupSelected:"📦 Group the 10 selected",
+      guessTitle:"Guess the number",
+      guessHear:"👂 I hear it",
+      guessSee:"👀 I see it",
+      guessMoreLess:"🔎 Higher or lower",
+      hintVisibleTime:"Hint visible for:",
+      hintSecondsAria:"Seconds the hint will be visible",
+      seconds:"seconds",
+      soundOn:"🔊 Sound",
+      soundOff:"🔇 Mute",
+      soundOnStatus:"Sound on.",
+      soundOffStatus:"Sound off.",
+      step:"by {n}",
+      unit:"unit", units:"units",
+      ten:"ten", tens:"tens",
+      counter:"counter", counters:"counters",
+      looseUnits:"loose units",
+      tenGroupAria:"Ten {g}: ten units",
+      tenGroupTitle:"1 ten = 10",
+      frameAria:"Ten frame {n}",
+      zeroMeaning:"Zero means there are no counters.",
+      rowTen:"Each full row has 10 counters.",
+      dotAria:"Counter {n}",
+      upToHere:"There are {n} up to here: {word}.",
+      zeroEmpty:"There are no counters here.<br>This represents the number 0.",
+      zeroGroups:"0 tens · 0 units",
+      zeroFrame:"The frame is empty because we have 0.",
+      zeroRods:"0 rods · 0 cubes",
+      noCountZero:"There are no counters to count: we have zero.",
+      countFinish:"There are {n}!",
+      invalidNumber:"Type a number between 0 and {max}.",
+      wordOk:"Yes: «{word}» is {n}.",
+      wordUnknown:"I don't recognise that word yet. Try a number from zero to {maxWord}.",
+      skipSummary:"From {start}, counting by {step}{tensNote}",
+      tensNote:" (in tens)",
+      sequencePrepared:"Sequence ready: {n} numbers.",
+      numberLineAria:"Number line showing the jumps",
+      seriesFinished:"Sequence finished!",
+      seriesStopped:"Sequence stopped.",
+      exploreSay:"Touch the counters and listen.",
+      skipSay:"Choose how to count and press Start.",
+      veryGood:"Well done! 🎉",
+      alreadyCounted:"You've already counted that one 😉",
+      howMany:"How many are there?",
+      countHint:"Look at the last number you said. Try again.",
+      countReveal:"There are {n}: {word}.",
+      countInstruction:"Touch each object once and count.",
+      buildPrompt:"Build {n}",
+      tenCubesToRod:"10 cubes! We exchange them for 1 ten rod.",
+      missing:"You need {n} more.",
+      extra:"You have {n} too many.",
+      buildReveal:"{t}: {d} {bars} and {u} {cubes}.",
+      bar:"ten rod", bars:"ten rods",
+      cube:"cube", cubes:"cubes",
+      chooseTen:"Choose 10 counters and press «Group».",
+      selectedMissing:"You have {have}. You need {n} more to make 10.",
+      selectedExtra:"You have {have}. There are {n} too many.",
+      groupsKeep:"{g} {word}! Keep going.",
+      noMoreGroups:"No more groups of ten can be made. How many counters are there altogether?",
+      groupHint:"Count in tens, then count the loose ones.",
+      groupReveal:"There are {g} groups of ten and {left} loose counters: {t}, {word}.",
+      tryAgain:"Try again.",
+      wasNumber:"It was {n}: {word}.",
+      whatHear:"What number do you hear?",
+      lookCarefully:"Look carefully…",
+      howManyWere:"How many counters were there?",
+      seeWhatNumber:"What number did you see?",
+      seeProgress:"Level up to {max} · Streak {streak}/{goal}",
+      seeLevelUp:"Great! I see it now goes up to {max}.",
+      guessed:"You guessed it! 🎉",
+      bigger:"It is higher ⬆️",
+      smaller:"It is lower ⬇️",
+      thinking:"I'm thinking of a number. Guess it!",
+      moreLogicLow:"Remember: I told you it was greater than {bound}. {v} cannot be right. Choose a number greater than {bound}.",
+      moreLogicHigh:"Remember: I told you it was smaller than {bound}. {v} cannot be right. Choose a number smaller than {bound}.",
+      resetConfirm:"Reset the star counter to 0?",
+      resetDone:"Star counter reset.",
+      gameTitle:"Path to the pool",
+      gameIntro:"Click the character with the number I ask for before they jump into the pool.",
+      gameSpeed:"Speed",
+      gameSpeedAria:"Select game speed",
+      gameSlow:"Slow",
+      gameNormal:"Normal",
+      gameFast:"Fast",
+      gamePoints:"Points",
+      gameRange:"Current range",
+      gameAccuracy:"Recent accuracy",
+      gameRate:"Hits/min",
+      gameSceneAria:"Path with characters moving towards a diving board and a pool",
+      gameAdaptiveHelp:"The range grows automatically when you keep your accuracy high and respond quickly.",
+      gameRestart:"↻ New game",
+      gameFind:"Find: {word}",
+      gameFindSpeech:"Find {word}.",
+      gameWrong:"No. Find {word}.",
+      gameLevelUp:"Great! Numbers up to {max} will now appear.",
+      gameRunnerAria:"Character with the number {n}",
+      gameMiss:"It jumped into the pool. Let's try another one.",
+      gameCorrect:"+1",
+      gameError:"−1",
+      hello:"Hello! Touch the counters and listen."
+    }
+  };
+
+  function t(key, vars={}){
+    let s = (TEXT[state.lang] && TEXT[state.lang][key]) ?? TEXT.es[key] ?? key;
+    return String(s).replace(/\{(\w+)\}/g, (_,name) => vars[name] ?? "");
+  }
+
+  const ES_UNITS = ["cero","uno","dos","tres","cuatro","cinco","seis","siete","ocho","nueve"];
+  const ES_SPECIAL = {
+    10:"diez",11:"once",12:"doce",13:"trece",14:"catorce",15:"quince",
+    16:"dieciséis",17:"diecisiete",18:"dieciocho",19:"diecinueve",
+    20:"veinte",21:"veintiuno",22:"veintidós",23:"veintitrés",24:"veinticuatro",
+    25:"veinticinco",26:"veintiséis",27:"veintisiete",28:"veintiocho",29:"veintinueve"
+  };
+  const ES_TENS = {30:"treinta",40:"cuarenta",50:"cincuenta",60:"sesenta",70:"setenta",80:"ochenta",90:"noventa"};
+
+  const VA_UNITS = ["zero","u","dos","tres","quatre","cinc","sis","set","huit","nou"];
+  const VA_SPECIAL = {10:"deu",11:"onze",12:"dotze",13:"tretze",14:"catorze",15:"quinze",16:"setze",17:"dèsset",18:"díhuit",19:"dènou",20:"vint"};
+  const VA_TENS = {30:"trenta",40:"quaranta",50:"cinquanta",60:"seixanta",70:"setanta",80:"huitanta",90:"noranta"};
+
+  const EN_UNITS = ["zero","one","two","three","four","five","six","seven","eight","nine"];
+  const EN_SPECIAL = {10:"ten",11:"eleven",12:"twelve",13:"thirteen",14:"fourteen",15:"fifteen",16:"sixteen",17:"seventeen",18:"eighteen",19:"nineteen"};
+  const EN_TENS = {20:"twenty",30:"thirty",40:"forty",50:"fifty",60:"sixty",70:"seventy",80:"eighty",90:"ninety"};
+
+  function numberToWordsLang(n,lang){
+    n = Math.max(0,Math.min(99,Math.trunc(n)));
+    if(lang==="es"){
+      if(n<10) return ES_UNITS[n];
+      if(n<=29) return ES_SPECIAL[n];
+      const ten = Math.floor(n/10)*10, u=n%10;
+      return u ? `${ES_TENS[ten]} y ${ES_UNITS[u]}` : ES_TENS[ten];
+    }
+    if(lang==="va"){
+      if(n<10) return VA_UNITS[n];
+      if(n<=20) return VA_SPECIAL[n];
+      if(n<30) return `vint-i-${VA_UNITS[n%10]}`;
+      const ten = Math.floor(n/10)*10, u=n%10;
+      return u ? `${VA_TENS[ten]}-${VA_UNITS[u]}` : VA_TENS[ten];
+    }
+    if(n<10) return EN_UNITS[n];
+    if(n<20) return EN_SPECIAL[n];
+    const ten = Math.floor(n/10)*10, u=n%10;
+    return u ? `${EN_TENS[ten]}-${EN_UNITS[u]}` : EN_TENS[ten];
+  }
+
+  function numberToWords(n){
+    return numberToWordsLang(n,state.lang);
+  }
+
+  function normalizeWord(text){
+    return text.toLowerCase().trim().normalize("NFD")
+      .replace(/[\u0300-\u036f]/g,"")
+      .replace(/[-–—]/g," ")
+      .replace(/\s+/g," ");
+  }
+
+  const wordToNumber = {es:{},va:{},en:{}};
+  ["es","va","en"].forEach(lang => {
+    for(let i=0;i<=99;i++) wordToNumber[lang][normalizeWord(numberToWordsLang(i,lang))] = i;
+  });
+  /* També acceptem les variants catalanes amb vuit/vuitanta. */
+  for(let i=0;i<=99;i++){
+    const w = numberToWordsLang(i,"va");
+    if(w.includes("huit")) wordToNumber.va[normalizeWord(w.replaceAll("huit","vuit"))] = i;
+  }
+
+
+  function clamp(n, max = state.max){
+    return Math.max(0, Math.min(max, Number.isFinite(n) ? Math.trunc(n) : 0));
+  }
+
+  const motion = () => matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+
+  function singularPlural(n,one,many){ return n===1 ? one : many; }
+
+  function describe(n){
+    const d = Math.floor(n/10);
+    const u = n%10;
+    const unitWord = singularPlural(n,t("unit"),t("units"));
+    if(n < 10) return `${n} ${unitWord}`;
+    const tenWord = singularPlural(d,t("ten"),t("tens"));
+    const uWord = singularPlural(u,t("unit"),t("units"));
+    const connector = state.lang==="en" ? "and" : (state.lang==="va" ? "i" : "y");
+    const s = `${d} ${tenWord} ${connector} ${u} ${uWord}`;
+    return u ? `${s} · ${d*10} + ${u}` : `${s} · ${d*10}`;
+  }
+
+  function setStatus(message,type=""){
+    el.status.className = "status" + (type ? ` ${type}` : "");
+    el.status.textContent = message;
+  }
+
+  function setSkipStatus(message,type=""){
+    el.skipStatus.className = "status" + (type ? ` ${type}` : "");
+    el.skipStatus.textContent = message;
+  }
+
+  function cancelSpeech(){
+    if("speechSynthesis" in window) window.speechSynthesis.cancel();
+  }
+
+  let fxCtx = null;
+  function getFxCtx(){
+    if(!state.sound) return null;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return null;
+    fxCtx ??= new AC();
+    if(fxCtx.state === "suspended") fxCtx.resume();
+    return fxCtx;
+  }
+
+  function fxTone(freq,start,duration,type="sine",gain=.05){
+    const ctx = getFxCtx();
+    if(!ctx) return;
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq,start);
+    g.gain.setValueAtTime(.0001,start);
+    g.gain.exponentialRampToValueAtTime(Math.max(.0001,gain),start+.02);
+    g.gain.exponentialRampToValueAtTime(.0001,start+duration);
+    osc.connect(g).connect(ctx.destination);
+    osc.start(start);
+    osc.stop(start+duration+.02);
+  }
+
+  function playEffect(kind){
+    if(!state.sound) return;
+    const ctx = getFxCtx();
+    if(!ctx) return;
+    const t0 = ctx.currentTime + .01;
+    if(kind==="correct") {
+      fxTone(523.25,t0,.12,"triangle",.05);
+      fxTone(659.25,t0+.09,.15,"triangle",.05);
+      fxTone(783.99,t0+.19,.18,"triangle",.055);
+    } else if(kind==="wrong") {
+      fxTone(210,t0,.18,"sawtooth",.045);
+      fxTone(155,t0+.08,.24,"sawtooth",.04);
+    } else if(kind==="miss") {
+      fxTone(420,t0,.07,"sine",.028);
+      fxTone(300,t0+.05,.13,"sine",.03);
+      fxTone(240,t0+.11,.18,"sine",.024);
+    }
+  }
+
+  /*
+   * Prepara el texto para la voz:
+   * - los emojis y flechas siguen visibles, pero no se pronuncian;
+   * - las cifras de 0 a 99 se convierten a palabras en el idioma activo.
+   *   Así, por ejemplo, en valenciano «10» se envía al TTS como «deu».
+   */
+  function speechText(text){
+    let s = String(text ?? "");
+    s = s.replace(/\b\d{1,2}\b/g, m => numberToWords(Number(m)));
+    s = s.replace(/\p{Extended_Pictographic}/gu, "")
+         .replace(/[\u2190-\u21FF\u2B00-\u2BFF]/g, "")
+         .replace(/[\uFE0E\uFE0F\u200D]/g, "")
+         .replace(/\s+([,.;:!?])/g, "$1")
+         .replace(/\s{2,}/g, " ")
+         .trim();
+    return s;
+  }
+
+  /* Dice cada número UNA sola vez. */
+  function speakOnce(text, onEnd){
+    text = speechText(text);
+    if(!text){
+      if(onEnd) setTimeout(onEnd, 250);
+      return;
+    }
+    if(!state.sound || !("speechSynthesis" in window)){
+      if(onEnd) setTimeout(onEnd, 900);
+      return;
+    }
+    cancelSpeech();
+    const utter = new SpeechSynthesisUtterance(text);
+    const info = LANG_INFO[state.lang] || LANG_INFO.es;
+    utter.lang = info.tts;
+    const voices = window.speechSynthesis.getVoices?.() || [];
+    const prefix = state.lang === "va" ? "ca" : info.tts.slice(0,2).toLowerCase();
+    const voice = voices.find(v => (v.lang || "").toLowerCase() === info.tts.toLowerCase())
+      || voices.find(v => (v.lang || "").toLowerCase().startsWith(prefix));
+    if(voice) utter.voice = voice;
+    utter.rate = state.lang === "en" ? 0.76 : 0.72;
+    utter.pitch = 1.02;
+    utter.onend = () => {
+      if(onEnd) setTimeout(onEnd, 420);
+    };
+    utter.onerror = () => {
+      if(onEnd) setTimeout(onEnd, 900);
+    };
+    window.speechSynthesis.speak(utter);
+  }
+
+  function stopAllSequences(){
+    state.countToken++;
+    state.skipToken++;
+    state.counting = false;
+    cancelSpeech();
+    clearCounted();
+  }
+
+  function setNumber(value, announce=false){
+    stopAllSequences();
+    state.number = clamp(Number(value));
+    el.numberInput.value = state.number;
+    const bd = Math.floor(state.number/10), bu = state.number%10;
+    el.bigNumber.innerHTML = state.number < 10
+      ? `<span class="d-unit">${bu}</span>`
+      : `<span class="d-ten">${bd}</span><span class="d-unit">${bu}</span>`;
+    el.numberWord.textContent = numberToWords(state.number);
+    el.decomposition.textContent = describe(state.number);
+    renderRepresentation();
+    setStatus(state.number === 0 ? t("zeroMeaning") : t("rowTen"));
+    if(announce) speakOnce(numberToWords(state.number));
+  }
+
+  function setView(view){
+    stopAllSequences();
+    state.view = view;
+    el.unitsViewBtn.setAttribute("aria-pressed", view==="units");
+    el.groupsViewBtn.setAttribute("aria-pressed", view==="groups");
+    el.framesViewBtn.setAttribute("aria-pressed", view==="frames");
+    $("rodsViewBtn").setAttribute("aria-pressed", view==="rods");
+    renderRepresentation();
+  }
+
+  function makeDot(index){
+    const dot = document.createElement("button");
+    dot.className = "dot";
+    dot.type = "button";
+    dot.setAttribute("aria-label", t("dotAria",{n:index}));
+    dot.dataset.index = index;
+    if((index-1)%10 >= 5) dot.classList.add("b");
+    dot.addEventListener("click", () => {
+      stopAllSequences();
+      el.objects.querySelectorAll(".dot").forEach(d => d.classList.toggle("upto", Number(d.dataset.index) <= index));
+      setStatus(t("upToHere",{n:index,word:numberToWords(index)}));
+      speakOnce(numberToWords(index));
+    });
+    return dot;
+  }
+
+  function renderUnits(){
+    if(state.number === 0){
+      el.objects.innerHTML = `<div class="zero-message">${t("zeroEmpty")}</div>`;
+      return;
+    }
+    const grid = document.createElement("div");
+    grid.className = "units-grid";
+    for(let i=1;i<=state.number;i++) grid.appendChild(makeDot(i));
+    el.objects.replaceChildren(grid);
+  }
+
+  function renderGroups(){
+    if(state.number === 0){
+      el.objects.innerHTML = `<div class="zero-message">${t("zeroGroups")}</div>`;
+      return;
+    }
+
+    const d = Math.floor(state.number/10);
+    const u = state.number%10;
+    const wrap = document.createElement("div");
+    wrap.className = "groups-wrap";
+
+    for(let g=1; g<=d; g++){
+      const group = document.createElement("div");
+      group.className = "ten-group";
+      group.setAttribute("aria-label", t("tenGroupAria",{g}));
+
+      const title = document.createElement("div");
+      title.className = "ten-title";
+      title.textContent = t("tenGroupTitle");
+
+      const grid = document.createElement("div");
+      grid.className = "ten-grid";
+
+      for(let i=0;i<10;i++){
+        const mini = document.createElement("span");
+        mini.className = "mini-dot";
+        mini.setAttribute("aria-hidden","true");
+        grid.appendChild(mini);
+      }
+      group.append(title,grid);
+      wrap.appendChild(group);
+    }
+
+    const loose = document.createElement("div");
+    loose.className = "loose";
+    loose.setAttribute("aria-label", `${u} ${t("looseUnits")}`);
+    for(let i=1;i<=u;i++) loose.appendChild(makeDot(d*10+i));
+    wrap.appendChild(loose);
+
+    el.objects.replaceChildren(wrap);
+  }
+
+  function renderFrames(){
+    if(state.number === 0){
+      el.objects.innerHTML = `<div class="zero-message">${t("zeroFrame")}</div>`;
+      return;
+    }
+
+    const frames = Math.ceil(state.number/10);
+    const wrap = document.createElement("div");
+    wrap.className = "frame-wrap";
+    let placed = 0;
+
+    for(let f=0; f<frames; f++){
+      const frame = document.createElement("div");
+      frame.className = "ten-frame";
+      frame.setAttribute("aria-label", t("frameAria",{n:f+1}));
+
+      for(let c=0;c<10;c++){
+        const cell = document.createElement("div");
+        cell.className = "frame-cell";
+        if(placed < state.number){
+          const mark = document.createElement("span");
+          mark.setAttribute("aria-hidden","true");
+          cell.appendChild(mark);
+          placed++;
+        }
+        frame.appendChild(cell);
+      }
+      wrap.appendChild(frame);
+    }
+    el.objects.replaceChildren(wrap);
+  }
+
+  function renderRepresentation(){
+    if(state.view==="units") renderUnits();
+    else if(state.view==="groups") renderGroups();
+    else if(state.view==="frames") renderFrames();
+    else renderRods();
+  }
+
+  function clearCounted(){
+    el.objects.querySelectorAll(".counted, .upto").forEach(n => n.classList.remove("counted","upto"));
+  }
+
+  function countWithMe(){
+    stopAllSequences();
+
+    if(state.number===0){
+      setStatus(t("noCountZero"));
+      speakOnce(numberToWords(0));
+      return;
+    }
+
+    if(state.view!=="units"){
+      state.view = "units";
+      el.unitsViewBtn.setAttribute("aria-pressed","true");
+      el.groupsViewBtn.setAttribute("aria-pressed","false");
+      el.framesViewBtn.setAttribute("aria-pressed","false");
+      $("rodsViewBtn").setAttribute("aria-pressed","false");
+      renderRepresentation();
+    }
+
+    const token = ++state.countToken;
+    state.counting = true;
+    const dots = [...el.objects.querySelectorAll(".dot")];
+    let i = 0;
+
+    const next = () => {
+      if(token !== state.countToken) return;
+      if(i>0) dots[i-1]?.classList.remove("counted");
+
+      if(i >= dots.length){
+        state.counting = false;
+        setStatus(t("countFinish",{n:state.number}), "good");
+        return;
+      }
+
+      dots[i].classList.add("counted");
+      const count = i+1;
+      setStatus(`${count}: ${numberToWords(count)}`);
+      i++;
+
+      speakOnce(numberToWords(count), next);
+    };
+
+    next();
+  }
+
+  function useNumericInput(){
+    const raw = Number(el.numberInput.value);
+    if(!Number.isFinite(raw) || raw<0 || raw>state.max){
+      setStatus(t("invalidNumber",{max:state.max}),"bad");
+      return;
+    }
+    setNumber(raw,true);
+  }
+
+  function useWordInput(){
+    const key = normalizeWord(el.wordInput.value);
+    const map = wordToNumber[state.lang];
+    if(key in map && map[key] <= state.max){
+      const n = map[key];
+      setNumber(n,true);
+      setStatus(t("wordOk",{word:numberToWords(n),n}),"good");
+    }else{
+      setStatus(t("wordUnknown",{maxWord:numberToWords(state.max)}),"bad");
+    }
+  }
+
+  function setMax(m){
+    state.max = m;
+    el.levels.querySelectorAll("[data-max]").forEach(b => b.setAttribute("aria-pressed", Number(b.dataset.max) === m));
+    el.numberInput.max = m;
+    el.maxLbl.textContent = `0–${m}`;
+    document.querySelectorAll('[data-change="10"],[data-change="-10"]').forEach(b => { b.disabled = m < 20; });
+    setNumber(state.number);
+    if(state.mode !== "explore") selectMode(state.mode);
+  }
+
+  /* selectMode: ver bloque v0.4 */
+
+  function getStart(){
+    const n = Number(el.startInput.value);
+    return clamp(n, 99);
+  }
+
+  function buildSequence(){
+    const start = getStart();
+    const step = state.skipStep;
+    const values = [];
+    for(let n=start; n<=99; n+=step) values.push(n);
+    return values;
+  }
+
+  function renderSkipSequence(){
+    const start = getStart();
+    const step = state.skipStep;
+    el.startInput.value = start;
+    el.skipSummary.textContent = t("skipSummary",{start,step,tensNote:step===10 ? t("tensNote") : ""});
+
+    const values = buildSequence();
+    const frag = document.createDocumentFragment();
+
+    values.forEach((n,index) => {
+      const item = document.createElement("div");
+      item.className = "seq-item";
+      item.dataset.index = index;
+      item.textContent = n;
+      item.setAttribute("aria-label", numberToWords(n));
+      frag.appendChild(item);
+    });
+
+    el.sequence.replaceChildren(frag);
+    renderLine(values);
+    setSkipStatus(t("sequencePrepared",{n:values.length}));
+  }
+
+  /* Recta numérica 0–99 con un arco por cada salto. */
+  function renderLine(values){
+    const step = state.skipStep, X = 10, y = 105, r = step === 1 ? 4 : 7;
+    const h = Math.min(75, 16 + step*6);
+    let s = `<svg viewBox="-12 0 1024 175" width="1024" height="175" role="img" aria-label="${t("numberLineAria")}"><line x1="0" y1="${y}" x2="990" y2="${y}" stroke="#4f5b60" stroke-width="3"/>`;
+    for(let n=0;n<=99;n++){
+      const x = n*X, t = n%10===0 ? 10 : 5;
+      s += `<line x1="${x}" x2="${x}" y1="${y-t}" y2="${y+t}" stroke="#4f5b60" stroke-width="2"/>`;
+      if(n%10===0) s += `<text x="${x}" y="${y+32}" text-anchor="middle" font-size="16" font-weight="800" fill="#6c777b">${n}</text>`;
+    }
+    values.forEach((n,i) => {
+      if(i===0) return;
+      const x1 = values[i-1]*X, x2 = n*X, m = (x1+x2)/2;
+      s += `<g class="arc" data-i="${i}"><path d="M${x1} ${y} Q${m} ${y-2*h} ${x2} ${y}"/>${step>1 ? `<text x="${m}" y="${y-h-6}">+${step}</text>` : ""}</g>`;
+    });
+    values.forEach(n => {
+      s += `<circle class="pt" cx="${n*X}" cy="${y}" r="${r}"/>`;
+      if(step>=5) s += `<text x="${n*X}" y="${y+56}" text-anchor="middle" font-size="17" font-weight="900">${n}</text>`;
+    });
+    el.line.innerHTML = s + "</svg>";
+    state.line = { pts:[...el.line.querySelectorAll(".pt")], arcs:[] };
+    el.line.querySelectorAll(".arc").forEach(g => { state.line.arcs[Number(g.dataset.i)] = g; });
+  }
+
+  function startSkipCounting(){
+    stopAllSequences();
+    renderSkipSequence();
+
+    const values = buildSequence();
+    const items = [...el.sequence.querySelectorAll(".seq-item")];
+    const token = ++state.skipToken;
+    let i = 0;
+
+    const next = () => {
+      if(token !== state.skipToken) return;
+
+      if(i>0){
+        items[i-1]?.classList.remove("active");
+        items[i-1]?.classList.add("done");
+      }
+
+      if(i >= values.length){
+        setSkipStatus(t("seriesFinished"),"good");
+        return;
+      }
+
+      items[i].classList.add("active");
+      items[i].scrollIntoView({block:"nearest",inline:"nearest",behavior:motion()});
+      state.line?.pts[i]?.classList.add("on");
+      state.line?.arcs[i]?.classList.add("on");
+      state.line?.pts[i]?.scrollIntoView({block:"nearest",inline:"center",behavior:motion()});
+      const n = values[i];
+      setSkipStatus(`${n}: ${numberToWords(n)}`);
+      i++;
+
+      speakOnce(numberToWords(n), next);
+    };
+
+    next();
+  }
+
+  document.querySelectorAll("[data-change]").forEach(btn => {
+    btn.addEventListener("click", () => setNumber(state.number + Number(btn.dataset.change),true));
+  });
+
+  el.showNumberBtn.addEventListener("click",useNumericInput);
+  el.numberInput.addEventListener("keydown",e => { if(e.key==="Enter") useNumericInput(); });
+
+  el.showWordBtn.addEventListener("click",useWordInput);
+  el.wordInput.addEventListener("keydown",e => { if(e.key==="Enter") useWordInput(); });
+
+  el.unitsViewBtn.addEventListener("click",() => setView("units"));
+  el.groupsViewBtn.addEventListener("click",() => setView("groups"));
+  el.framesViewBtn.addEventListener("click",() => setView("frames"));
+
+  el.countBtn.addEventListener("click",countWithMe);
+
+  el.speakBtn.addEventListener("click",() => {
+    stopAllSequences();
+    speakOnce(numberToWords(state.number));
+    setStatus(`${state.number}: ${numberToWords(state.number)}.`);
+  });
+
+  el.randomBtn.addEventListener("click",() => {
+    let n;
+    do { n = Math.floor(Math.random()*(state.max+1)); } while(n === state.number && state.max > 0);
+    setNumber(n,true);
+  });
+
+  el.levels.querySelectorAll("[data-max]").forEach(b =>
+    b.addEventListener("click",() => setMax(Number(b.dataset.max)))
+  );
+
+  el.soundBtn.addEventListener("click",() => {
+    stopAllSequences();
+    state.sound = !state.sound;
+    el.soundBtn.setAttribute("aria-pressed",state.sound);
+    el.soundBtn.textContent = state.sound ? t("soundOn") : t("soundOff");
+    if(!state.sound) cancelSpeech();
+    setStatus(state.sound ? t("soundOnStatus") : t("soundOffStatus"));
+    setSkipStatus(state.sound ? t("soundOnStatus") : t("soundOffStatus"));
+  });
+
+  el.exploreTab.addEventListener("click",() => selectMode("explore"));
+  el.skipTab.addEventListener("click",() => selectMode("skip"));
+
+  el.stepPicks.querySelectorAll("[data-step]").forEach(btn => {
+    btn.addEventListener("click",() => {
+      stopAllSequences();
+      state.skipStep = Number(btn.dataset.step);
+      el.stepPicks.querySelectorAll("[data-step]").forEach(b =>
+        b.setAttribute("aria-pressed", b===btn ? "true" : "false")
+      );
+      renderSkipSequence();
+    });
+  });
+
+  el.startInput.addEventListener("change",() => {
+    stopAllSequences();
+    renderSkipSequence();
+  });
+
+  el.startSkipBtn.addEventListener("click",startSkipCounting);
+
+  el.stopSkipBtn.addEventListener("click",() => {
+    stopAllSequences();
+    setSkipStatus(t("seriesStopped"));
+  });
+
+  document.addEventListener("keydown",e => {
+    const tag = document.activeElement?.tagName;
+    if(tag==="INPUT" || tag==="TEXTAREA") return;
+    if(!el.exploreMode.classList.contains("active")) return;
+
+    if(/^\d$/.test(e.key)){
+      state.keyboardBuffer += e.key;
+      if(state.keyboardBuffer.length>2) state.keyboardBuffer = e.key;
+      clearTimeout(state.keyboardTimer);
+      state.keyboardTimer = setTimeout(() => {
+        const n = Number(state.keyboardBuffer);
+        if(n<=state.max) setNumber(n,true);
+        state.keyboardBuffer = "";
+      },700);
+    }
+
+    if(e.key==="Enter" && state.keyboardBuffer){
+      const n = Number(state.keyboardBuffer);
+      if(n<=state.max) setNumber(n,true);
+      state.keyboardBuffer = "";
+      clearTimeout(state.keyboardTimer);
+    }
+
+    if(e.key==="Backspace"){
+      state.keyboardBuffer = state.keyboardBuffer.slice(0,-1);
+    }
+
+    if(e.key==="ArrowUp" || e.key==="+"){
+      e.preventDefault();
+      setNumber(state.number+1,true);
+    }
+
+    if(e.key==="ArrowDown" || e.key==="-"){
+      e.preventDefault();
+      setNumber(state.number-1,true);
+    }
+  });
+
+
+  /* ===== v0.4: mascota, rondas y 4 modos de juego ===== */
+  const MODES = ["explore","skip","count","build","group","guess","game"];
+  let T, fails = 0, lastSp = "", stars = 0, GG = "hear", S = 0;
+  const SEE_GOAL = 5;
+  const SEE = {max:10, streak:0, pendingLevelUp:false, roundLocked:false};
+  const MORE = {roundLocked:false,low:-1,high:100,lastGuess:null};
+  const B = {t:1,d:0,u:0};
+  try{ stars = Number(localStorage.getItem("stars04")) || 0; }catch(e){}
+  const later = (f,ms) => { clearTimeout(T); T = setTimeout(f,ms); };
+  const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+  const mk = (tag,cls,txt="") => { const n = document.createElement(tag); if(tag==="button") n.type="button"; n.className = cls; n.textContent = txt; return n; };
+  const digs = n => n < 10 ? `<span class="d-unit">${n}</span>` : `<span class="d-ten">${Math.floor(n/10)}</span><span class="d-unit">${n%10}</span>`;
+  const showStars = () => { $("stars").textContent = "⭐ " + stars; };
+  function star(){ stars++; showStars(); try{ localStorage.setItem("stars04",stars); }catch(e){} }
+  function say(t, sp = t){ $("say").textContent = t; lastSp = sp; if(sp) speakOnce(sp); }
+
+  /* Fallo 1: pista. Fallo 2: solución. Sin castigo. */
+  function answer(good,hint,reveal,next){
+    if(good){ fails = 0; star(); say(t("veryGood")); later(next,1500); return true; }
+    if(++fails >= 2){ fails = 0; say(reveal); later(next,3200); } else say(hint);
+    return false;
+  }
+  function opts(n,max){
+    const c = [(n%10)*10+Math.floor(n/10), n+1, n-1, n+10, n-10, n+2, n-2].sort(() => Math.random()-.5);
+    const s = [n];
+    c.forEach(v => { if(s.length<3 && v>=0 && v<=max && !s.includes(v)) s.push(v); });
+    while(s.length<3){ const v = rnd(0,max); if(!s.includes(v)) s.push(v); }
+    return s.sort(() => Math.random()-.5);
+  }
+  function choices(box,vals,cb){
+    box.replaceChildren(...vals.map(v => { const b = mk("button","choice",v); b.onclick = () => { if(cb(v) === false) b.disabled = true; }; return b; }));
+  }
+  function blocks(box,d,u){
+    const w = mk("div","blocks");
+    for(let i=0;i<d;i++){ const r = mk("div","rod"); r.innerHTML = "<i></i>".repeat(10); w.appendChild(r); }
+    const l = mk("div","cubes");
+    for(let i=0;i<u;i++) l.appendChild(mk("span","cube"));
+    w.appendChild(l); box.replaceChildren(w);
+  }
+  function renderRods(){
+    if(!state.number){ el.objects.innerHTML = `<div class="zero-message">${t("zeroRods")}</div>`; return; }
+    blocks(el.objects, Math.floor(state.number/10), state.number%10);
+  }
+  function frameEl(n){
+    const f = mk("div","ten-frame");
+    for(let i=0;i<10;i++){ const c = mk("div","frame-cell"); if(i<n) c.innerHTML = "<span></span>"; f.appendChild(c); }
+    return f;
+  }
+
+  function selectMode(mode){
+    if(state.mode==="game") stopGame();
+    stopAllSequences(); clearTimeout(T); state.mode = mode;
+    MODES.forEach(m => { $(m+"Mode").classList.toggle("active",m===mode); $(m+"Tab").setAttribute("aria-selected",m===mode); });
+    if(mode==="skip") renderSkipSequence();
+    if(mode==="count") newCount();
+    if(mode==="build") newBuild();
+    if(mode==="group") newGroup();
+    if(mode==="guess") newGuess();
+    if(mode==="game") setupGameIdle();
+    if(mode==="explore") say(t("exploreSay"),"");
+    if(mode==="skip") say(t("skipSay"),"");
+  }
+
+  /* 1) Cuenta los objetos: una vez cada uno, y luego "¿cuántos hay?" */
+  function newCount(){
+    fails = 0; let done = 0;
+    const n = rnd(1,Math.min(state.max,20)), e = ["🍎","🐟","⭐","🐥","🌸","🚗"][rnd(0,5)];
+    $("cChoices").replaceChildren();
+    $("cArea").replaceChildren(...Array.from({length:n},() => {
+      const b = mk("button","obj",e);
+      b.onclick = () => {
+        if(b.classList.contains("seen")){ say(t("alreadyCounted")); return; }
+        b.classList.add("seen"); done++; say(numberToWords(done));
+        if(done===n) later(() => {
+          say(t("howMany"));
+          choices($("cChoices"),opts(n,state.max),v => answer(v===n,t("countHint"),t("countReveal",{n,word:numberToWords(n)}),newCount));
+        },1100);
+      };
+      return b;
+    }));
+    say(t("countInstruction"));
+  }
+
+  /* 2) Construye el número con barras de 10 y cubitos */
+  function drawB(){
+    blocks($("bArea"),B.d,B.u);
+    $("bNow").innerHTML = digs(B.d*10+B.u);
+    $("bNowLine").hidden = $("bHideCount").checked;
+  }
+  function newBuild(){
+    fails = 0; B.t = rnd(1,state.max); B.d = 0; B.u = 0;
+    $("bTarget").innerHTML = digs(B.t); drawB();
+    say(t("buildPrompt",{n:B.t}), t("buildPrompt",{n:numberToWords(B.t)}));
+  }
+  $("bTen").onclick = () => { if(B.d<9){ B.d++; drawB(); } };
+  $("bOne").onclick = () => {
+    if(++B.u===10){ B.u = 0; B.d = Math.min(9,B.d+1); say(t("tenCubesToRod")); }
+    drawB();
+  };
+  $("bUndo").onclick = () => { if(B.u) B.u--; else if(B.d) B.d--; drawB(); };
+  $("bOk").onclick = () => {
+    const v = B.d*10+B.u, target = B.t;
+    const d = Math.floor(target/10), u = target%10;
+    const bars = singularPlural(d,t("bar"),t("bars"));
+    const cubes = singularPlural(u,t("cube"),t("cubes"));
+    answer(v===target, v<target ? t("missing",{n:target-v}) : t("extra",{n:v-target}),
+      t("buildReveal",{t:target,d,u,bars,cubes}), newBuild);
+  };
+
+  /* 3) Haz grupos de diez */
+  function newGroup(){
+    fails = 0; const n = rnd(10,Math.min(state.max,45));
+    $("gLoose").replaceChildren(...Array.from({length:n},() => { const b = mk("button","dot"); b.onclick = () => b.classList.toggle("sel"); return b; }));
+    $("gGroups").replaceChildren(); $("gChoices").replaceChildren();
+    say(t("chooseTen"));
+  }
+  $("gBtn").onclick = () => {
+    const sel = [...$("gLoose").querySelectorAll(".sel")];
+    if(sel.length !== 10){ say(sel.length<10 ? t("selectedMissing",{have:sel.length,n:10-sel.length}) : t("selectedExtra",{have:sel.length,n:sel.length-10})); return; }
+    sel.forEach(s => s.remove());
+    const r = mk("div","rod"); r.innerHTML = "<i></i>".repeat(10); $("gGroups").appendChild(r);
+    const left = $("gLoose").children.length, g = $("gGroups").children.length, total = g*10+left;
+    if(left >= 10){ say(t("groupsKeep",{g,word:singularPlural(g,t("ten"),t("tens"))})); return; }
+    say(t("noMoreGroups"));
+    choices($("gChoices"),opts(total,state.max),v => answer(v===total,t("groupHint"),
+      t("groupReveal",{g,left,t:total,word:numberToWords(total)}),newGroup));
+  };
+
+  /* 4) Adivina el número */
+  const pick = v => answer(v===S,t("tryAgain"),t("wasNumber",{n:S,word:numberToWords(S)}),newGuess);
+
+  function updateSeeProgress(){
+    const el = $("uSeeProgress");
+    if(!el) return;
+    el.textContent = t("seeProgress",{max:SEE.max,streak:SEE.streak,goal:SEE_GOAL});
+  }
+
+  function seeTarget(){
+    if(SEE.max<=10) return rnd(1,10);
+    /* Al subir de decena damos más presencia a la decena recién incorporada,
+       sin dejar de repasar números anteriores. */
+    if(Math.random()<0.65){
+      const lo = Math.max(1,SEE.max-9);
+      return rnd(lo,SEE.max);
+    }
+    return rnd(1,SEE.max);
+  }
+
+  function renderSeeNumber(box,n){
+    if(n<=10){
+      box.replaceChildren(frameEl(n));
+      return;
+    }
+    if(n<=20){
+      const wrap = mk("div","frame-wrap");
+      wrap.appendChild(frameEl(10));
+      if(n>10) wrap.appendChild(frameEl(n-10));
+      box.replaceChildren(wrap);
+      return;
+    }
+    /* A partir de 21 evitamos decenas de fichas sueltas: mostramos
+       barras de diez y cubitos, igual que en Construye. */
+    blocks(box,Math.floor(n/10),n%10);
+  }
+
+  function pickSee(v){
+    /* Un acierto solo puede contabilizarse una vez por ronda.
+       Bloqueamos de forma síncrona antes de modificar racha/estrellas para
+       que un doble clic o varios clics rápidos no vuelvan a entrar. */
+    if(SEE.roundLocked) return true;
+    const good = v===S;
+    if(!good){
+      SEE.streak = 0;
+      SEE.pendingLevelUp = false;
+      updateSeeProgress();
+      return answer(false,t("tryAgain"),t("wasNumber",{n:S,word:numberToWords(S)}),newGuess);
+    }
+
+    /* Cerramos la ronda lógicamente, pero mantenemos las opciones visibles
+       y con su aspecto normal. Los clics posteriores entran en el guard de
+       SEE.roundLocked y no vuelven a sumar el acierto. */
+    SEE.roundLocked = true;
+    SEE.streak = Math.min(SEE_GOAL,SEE.streak+1);
+    if(SEE.streak>=SEE_GOAL && SEE.max<99){
+      SEE.max = Math.min(99,SEE.max+10);
+      SEE.streak = 0;
+      SEE.pendingLevelUp = true;
+    }
+    updateSeeProgress();
+
+    if(SEE.pendingLevelUp){
+      SEE.pendingLevelUp = false;
+      fails = 0;
+      star();
+      say(t("seeLevelUp",{max:SEE.max}));
+      later(newGuess,1900);
+      return true;
+    }
+    return answer(true,t("tryAgain"),t("wasNumber",{n:S,word:numberToWords(S)}),newGuess);
+  }
+
+  function newGuess(){
+    fails = 0; const box = $("uArea"), ch = $("uChoices"); ch.replaceChildren();
+    if(GG==="hear"){
+      S = rnd(0,state.max); box.innerHTML = '<div class="big-q">🔊 ?</div>';
+      say(t("whatHear"), numberToWords(S)); choices(ch,opts(S,state.max),pick);
+    }else if(GG==="see"){
+      SEE.roundLocked = false;
+      S = seeTarget();
+      renderSeeNumber(box,S);
+      updateSeeProgress();
+      say(t("lookCarefully"),"");
+      const seconds = Math.max(0.5, Math.min(15, Number($("uSeeSeconds").value) || 2.5));
+      $("uSeeSeconds").value = seconds;
+      later(() => {
+        box.innerHTML = '<div class="big-q">?</div>';
+        say(t("seeWhatNumber"));
+        choices(ch,opts(S,SEE.max),pickSee);
+      },seconds*1000);
+    }else{
+      MORE.roundLocked = false;
+      MORE.low = -1;
+      MORE.high = state.max + 1;
+      MORE.lastGuess = null;
+      S = rnd(0,state.max);
+      const tiles = Array.from({length:state.max+1},(_,v) => {
+        const b = mk("button","tile",v);
+        b.onclick = () => {
+          if(MORE.roundLocked) return;
+
+          /* Las pistas anteriores no eliminan ni desactivan números.
+             Se conservan como límites lógicos. Si el nuevo intento contradice
+             una pista, señalamos el error de razonamiento y dejamos la ronda
+             exactamente donde estaba. */
+          if(v <= MORE.low){
+            playEffect("wrong");
+            b.classList.remove("logic-error"); void b.offsetWidth; b.classList.add("logic-error");
+            say(t("moreLogicLow",{bound:MORE.low,v}));
+            return;
+          }
+          if(v >= MORE.high){
+            playEffect("wrong");
+            b.classList.remove("logic-error"); void b.offsetWidth; b.classList.add("logic-error");
+            say(t("moreLogicHigh",{bound:MORE.high,v}));
+            return;
+          }
+
+          MORE.lastGuess = v;
+          if(v===S){
+            MORE.roundLocked = true;
+            star();
+            say(t("guessed"));
+            later(newGuess,1800);
+            return;
+          }
+          if(v<S){
+            MORE.low = v;
+            say(t("bigger"));
+          }else{
+            MORE.high = v;
+            say(t("smaller"));
+          }
+        };
+        return b;
+      });
+      box.replaceChildren(...tiles); say(t("thinking"));
+    }
+  }
+  function updateGuessSettings(){
+    $("uSeeSettings").hidden = GG !== "see";
+    if(GG === "see") updateSeeProgress();
+  }
+
+  $("uSel").querySelectorAll("[data-g]").forEach(b => b.addEventListener("click",() => {
+    clearTimeout(T);
+    T = null;
+    GG = b.dataset.g;
+    $("uSel").querySelectorAll("[data-g]").forEach(x => x.setAttribute("aria-pressed", x===b));
+    updateGuessSettings();
+    newGuess();
+  }));
+
+  $("uSeeSeconds").addEventListener("change",() => {
+    let seconds = Number($("uSeeSeconds").value);
+    if(!Number.isFinite(seconds)) seconds = 2.5;
+    seconds = Math.max(0.5,Math.min(15,seconds));
+    $("uSeeSeconds").value = seconds;
+    if(GG === "see") newGuess();
+  });
+
+  /* ===== 5) Juego: camino, trampolín y piscina ===== */
+  const GAME_SPEEDS = {
+    slow:   {travel:9200, spawn:2000, unlockRate:7.5},
+    normal: {travel:7000, spawn:1450, unlockRate:10},
+    fast:   {travel:5200, spawn:1080, unlockRate:12.5}
+  };
+  const GAME_DIFFICULTIES = {easy:1, medium:2, hard:3};
+  const GAME_FACES = ["🧒","👧","👦","🧑","👩","👨"];
+  const GAME_LANES = {1:{height:235,bottoms:[16]},2:{height:350,bottoms:[16,138]},3:{height:470,bottoms:[16,138,260]}};
+  const G = {phase:"idle",running:false,paused:false,speed:"normal",difficulty:"easy",laneCount:1,startMax:10,max:10,score:0,target:null,previousTarget:null,targetSpawned:false,targetAvailableAt:0,spawnCountdown:1,wrongThisRound:0,history:[],levelUps:0,spawnTimer:null,spawnDue:0,spawnRemaining:0,nextTargetTimer:null,nextTargetDue:0,nextTargetRemaining:0,runnerSeq:0,pauseStarted:0,pairPending:null,activeLanes:[]};
+  const GMSG = {
+    start:{es:"▶ Iniciar",va:"▶ Iniciar",en:"▶ Start"},
+    pause:{es:"⏸ Pausa",va:"⏸ Pausa",en:"⏸ Pause"},
+    resume:{es:"▶ Reanudar",va:"▶ Reprendre",en:"▶ Resume"},
+    end:{es:"■ Terminar",va:"■ Acabar",en:"■ End"},
+    ready:{es:"Pulsa Iniciar para comenzar.",va:"Prem Iniciar per a començar.",en:"Press Start to begin."},
+    paused:{es:"Partida en pausa.",va:"Partida en pausa.",en:"Game paused."},
+    ended:{es:"Partida terminada. Puntos finales: {score}.",va:"Partida acabada. Punts finals: {score}.",en:"Game over. Final points: {score}."},
+    startSpeech:{es:"Busca el número que te diga.",va:"Busca el nombre que et diré.",en:"Find the number I say."},
+    rewards:{es:"Recompensas",va:"Recompenses",en:"Rewards"},
+    easy:{es:"Fácil · 1",va:"Fàcil · 1",en:"Easy · 1"},
+    medium:{es:"Medio · 2",va:"Mitjà · 2",en:"Medium · 2"},
+    hard:{es:"Difícil · 3",va:"Difícil · 3",en:"Hard · 3"},
+    paths:{es:"Caminos",va:"Camins",en:"Paths"}
+  };
+  function gmsg(key,vars={}){ let s=(GMSG[key]&&GMSG[key][state.lang])||GMSG[key]?.es||key; return String(s).replace(/\{(\w+)\}/g,(_,n)=>vars[n]??""); }
+  function gameMetrics(){ const h=G.history.slice(-12), correct=h.reduce((s,r)=>s+(r.correct?1:0),0), errors=h.reduce((s,r)=>s+r.errors,0), attempts=correct+errors, accuracy=attempts?correct/attempts:null, elapsed=h.reduce((s,r)=>s+Math.max(250,r.responseMs),0), rate=elapsed?correct*60000/elapsed:null; return {rounds:h.length,correct,errors,accuracy,rate}; }
+  function gameFeedback(text,type=""){ const box=$("gameFeedback"); box.className="game-feedback"+(type?` ${type}`:""); box.textContent=text; clearTimeout(box._timer); box._timer=setTimeout(()=>{box.textContent="";box.className="game-feedback"},1000); }
+  function updateGameLabels(){ const diffWrap=$("gameDifficulty"); if(diffWrap){ diffWrap.previousElementSibling.textContent=gmsg("paths"); const bs=diffWrap.querySelectorAll("button"); if(bs[0]) bs[0].textContent=gmsg("easy"); if(bs[1]) bs[1].textContent=gmsg("medium"); if(bs[2]) bs[2].textContent=gmsg("hard"); } $("gameRewardsBar").previousElementSibling.textContent=gmsg("rewards"); }
+  function updateGameRewards(){ const bar=$("gameRewardsBar"), stars=Math.floor(G.score/5), chips=[]; for(let i=0;i<stars;i++) chips.push('<span class="reward-chip" aria-hidden="true">⭐</span>'); for(let i=0;i<G.levelUps;i++) chips.push('<span class="reward-chip medal" aria-hidden="true">🏅</span>'); bar.innerHTML=chips.join("") || '<span style="color:var(--muted);font-weight:800">—</span>'; }
+  function updateGameHud(){ $("gameScore").textContent=G.score; $("gameRange").textContent=`0–${G.max}`; const m=gameMetrics(); $("gameAccuracy").textContent=m.accuracy==null?"—":`${Math.round(m.accuracy*100)}%`; $("gameRate").textContent=m.rate==null?"—":m.rate.toFixed(1); $("gameSpeed").querySelectorAll("[data-game-speed]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.gameSpeed===G.speed?"true":"false")); $("gameDifficulty").querySelectorAll("[data-game-difficulty]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.gameDifficulty===G.difficulty?"true":"false")); updateGameLabels(); updateGameRewards(); }
+  function updateGameControls(){ $("gameStart").textContent=gmsg("start"); $("gamePause").textContent=G.paused?gmsg("resume"):gmsg("pause"); $("gameEnd").textContent=gmsg("end"); $("gamePause").disabled=(G.phase==="idle"||G.phase==="ended"); $("gameEnd").disabled=(G.phase==="idle"||G.phase==="ended"); }
+  function laneEl(i){ return $("gameLane"+i); }
+  function laneCanSpawn(i,minGap=135){
+    const lane=laneEl(i); if(!lane) return false;
+    const lr=lane.getBoundingClientRect();
+    const runners=[...lane.querySelectorAll(".game-runner")].filter(r=>r.dataset.done!=="1");
+    if(!runners.length) return true;
+    const nearest=Math.min(...runners.map(r=>r.getBoundingClientRect().left-lr.left));
+    return nearest > minGap;
+  }
+  function spawnableLanes(minGap=135){ return Array.from({length:G.laneCount},(_,i)=>i).filter(i=>laneCanSpawn(i,minGap)); }
+  function renderGameLanes(){ G.laneCount=GAME_DIFFICULTIES[G.difficulty]||1; const cfg=GAME_LANES[G.laneCount], scene=$("gameScene"); scene.style.height=`${cfg.height}px`; scene.classList.remove("paused"); scene.innerHTML=cfg.bottoms.map((b,i)=>`<div class="game-lane" id="gameLane${i}" style="bottom:${b}px"><div class="game-path" aria-hidden="true"></div><div class="game-trampoline" aria-hidden="true"></div><div class="game-pool" aria-hidden="true"></div></div>`).join(""); }
+  function gameBurst(text,lane=null){ const host=lane||$("gameScene"), b=document.createElement("span"); b.className="game-burst"; b.setAttribute("aria-hidden","true"); b.textContent=text; if(host===$("gameScene")){ b.style.left="50%"; b.style.right="auto"; b.style.bottom="46%"; b.style.transform="translateX(-50%)"; } host.appendChild(b); setTimeout(()=>b.remove(),980); }
+  function gameSplash(lane){ const s=document.createElement("span"); s.className="game-splash"; s.setAttribute("aria-hidden","true"); s.textContent="💦"; (lane||$("gameScene")).appendChild(s); setTimeout(()=>s.remove(),820); }
+  function clearGameTimers(){ clearTimeout(G.spawnTimer); clearTimeout(G.nextTargetTimer); G.spawnTimer=G.nextTargetTimer=null; G.spawnDue=G.nextTargetDue=0; G.spawnRemaining=G.nextTargetRemaining=0; }
+  function stopGame(clearScene=true){ G.running=false; G.paused=false; if(G.pairPending){ clearTimeout(G.pairPending); G.pairPending=null; } clearGameTimers(); const scene=$("gameScene"); scene?.classList.remove("paused"); if(clearScene&&scene) scene.querySelectorAll(".game-runner,.game-splash,.game-burst").forEach(r=>{ clearTimeout(r._travelTimer); r.remove(); }); updateGameControls(); }
+  function gameRecordRound(correct,responseMs,errors){ G.history.push({correct,responseMs,errors}); if(G.history.length>12) G.history.shift(); updateGameHud(); const m=gameMetrics(), cfg=GAME_SPEEDS[G.speed]; if(correct&&G.max<99&&m.rounds>=12&&m.accuracy>=.90&&m.rate>=cfg.unlockRate){ G.max=Math.min(99,G.max+10); G.levelUps+=1; G.history=[]; updateGameHud(); return true; } return false; }
+  function gameChooseTarget(){ let lo=0,hi=G.max; if(G.max>G.startMax&&Math.random()<.62){ lo=Math.floor((G.max-1)/10)*10+1; hi=G.max; } const active=new Set([...( $("gameScene")?.querySelectorAll(".game-runner")||[])].map(r=>Number(r.dataset.number))); let n=rnd(lo,hi),tries=0; while(tries++<40&&((hi>lo&&n===G.previousTarget)||active.has(n))) n=rnd(lo,hi); G.previousTarget=n; return n; }
+  function gameSetPromptText(text){ $("gamePrompt").textContent=text; }
+  function gamePromptNext(){ if(!G.running||G.paused) return; G.target=gameChooseTarget(); G.targetSpawned=false; G.targetAvailableAt=0; G.wrongThisRound=0; G.spawnCountdown=rnd(1,Math.max(2,G.laneCount+1)); const word=numberToWords(G.target); gameSetPromptText(word); say(t("gameFindSpeech",{word}),t("gameFindSpeech",{word})); }
+  function gameScheduleNextPrompt(delay=520){ clearTimeout(G.nextTargetTimer); if(!G.running) return; G.nextTargetRemaining=delay; G.nextTargetDue=Date.now()+delay; G.nextTargetTimer=setTimeout(gamePromptNext,delay); }
+  function gamePickDecoy(){ if(G.max===0) return 0; let n,tries=0; do{ n=rnd(0,G.max); tries++; }while((n===G.target||Number.isNaN(n))&&tries<20); return n; }
+  function gameSpawnNumber(){ if(G.target!=null&&!G.targetSpawned){ G.spawnCountdown--; if(G.spawnCountdown<=0) return G.target; } return gamePickDecoy(); }
+  function freezeRunner(runner){
+    clearTimeout(runner._travelTimer);
+    const host=runner.parentElement;
+    const sr=host.getBoundingClientRect();
+    const rr=runner.getBoundingClientRect();
+    runner.style.animation="none";
+    runner.style.transform="none";
+    runner.style.left=`${Math.max(-84,rr.left-sr.left)}px`;
+  }
+  function removeRunnerLater(runner,delay){ setTimeout(()=>runner.remove(),delay); }
+  function gameAnnounceLevelUp(){ const msg=t("gameLevelUp",{max:G.max}); gameBurst("🏅",$("gameScene")); gameSetPromptText(msg); $("say").textContent=msg; lastSp=msg; speakOnce(msg,()=>{ if(G.running&&!G.paused) gameScheduleNextPrompt(260); }); }
+  function gameCorrectRunner(runner){ if(!G.running||G.paused||runner.dataset.done==="1") return; runner.dataset.done="1"; const laneIndex=Number(runner.dataset.lane||0); const responseMs=G.targetAvailableAt?Date.now()-G.targetAvailableAt:GAME_SPEEDS[G.speed].travel; G.score+=1; playEffect("correct"); gameFeedback(t("gameCorrect"),"good"); freezeRunner(runner); runner.querySelector(".runner-card")?.classList.add("happy"); gameBurst("✨",runner.parentElement); if(G.score>0&&G.score%5===0) gameBurst("⭐",$("gameScene")); const unlocked=gameRecordRound(true,responseMs,G.wrongThisRound); G.target=null; G.targetSpawned=false; G.targetAvailableAt=0; G.wrongThisRound=0; removeRunnerLater(runner,800); if(unlocked) gameAnnounceLevelUp(); else gameScheduleNextPrompt(520); }
+  function gameWrongRunner(runner){ if(!G.running||G.paused||runner.dataset.done==="1"||G.target==null) return; G.score=Math.max(0,G.score-1); G.wrongThisRound++; playEffect("wrong"); updateGameHud(); gameFeedback(t("gameError"),"bad"); const card=runner.querySelector(".runner-card"); card?.classList.remove("wrong"); void card?.offsetWidth; card?.classList.add("wrong"); const word=numberToWords(G.target); say(t("gameWrong",{word}),t("gameWrong",{word})); }
+  function gameTargetMissed(){ if(!G.running||G.paused||G.target==null) return; const responseMs=G.targetAvailableAt?Date.now()-G.targetAvailableAt:GAME_SPEEDS[G.speed].travel; playEffect("miss"); gameFeedback(t("gameMiss")); gameRecordRound(false,responseMs,0); G.target=null; G.targetSpawned=false; G.targetAvailableAt=0; G.wrongThisRound=0; gameScheduleNextPrompt(460); }
+  function gameRunnerReached(runner){ if(!runner.isConnected||runner.dataset.done==="1") return; runner.dataset.done="1"; const lane=runner.parentElement, laneIndex=Number(runner.dataset.lane||0), n=Number(runner.dataset.number); freezeRunner(runner); if(n===G.target) gameTargetMissed(); runner.classList.add("diving"); runner.style.animation="gameDive .82s ease-in forwards"; setTimeout(()=>{ gameSplash(lane); runner.remove(); },780); }
+  function spawnGameRunner(options={}){
+    if(!G.running||G.paused) return null;
+    const minGap=options.minGap ?? 135;
+    const candidates=spawnableLanes(minGap);
+
+    let laneIndex=null;
+    if(options.forcePreferred && options.preferredLane!=null && laneEl(options.preferredLane)){
+      laneIndex=options.preferredLane;
+    }else{
+      if(!candidates.length) return null;
+      laneIndex=(options.preferredLane!=null && candidates.includes(options.preferredLane))
+        ? options.preferredLane
+        : candidates[rnd(0,candidates.length-1)];
+    }
+
+    const lane=laneEl(laneIndex);
+    let n=gameSpawnNumber();
+    if(options.avoidNumber!=null && n===options.avoidNumber){
+      let tries=0;
+      do{ n=gamePickDecoy(); tries++; }while(n===options.avoidNumber && tries<12);
+    }
+
+    const runner=document.createElement("button");
+    runner.type="button";
+    runner.className="game-runner";
+    runner.dataset.number=n;
+    runner.dataset.id=++G.runnerSeq;
+    runner.dataset.lane=laneIndex;
+    runner.setAttribute("aria-label",t("gameRunnerAria",{n}));
+
+    const card=document.createElement("span");
+    card.className="runner-card";
+    const face=document.createElement("span");
+    face.className="runner-face";
+    face.setAttribute("aria-hidden","true");
+    face.textContent=GAME_FACES[rnd(0,GAME_FACES.length-1)];
+    const badge=document.createElement("span");
+    badge.className="runner-number";
+    badge.textContent=n;
+    card.append(face,badge);
+    runner.appendChild(card);
+
+    const cfg=GAME_SPEEDS[G.speed];
+    const speedFactor=options.speedFactor ?? (.78+Math.random()*.48);
+    const duration=Math.round(cfg.travel*speedFactor);
+    runner.style.animationDuration=`${duration}ms`;
+    runner.style.bottom=`${52 + (G.runnerSeq%3)*6}px`;
+    runner.style.zIndex=String(5+(G.runnerSeq%3));
+    if(options.animationLeadMs){
+      runner.style.animationDelay=`-${Math.max(0,options.animationLeadMs)}ms`;
+    }
+
+    if(n===G.target&&!G.targetSpawned){ G.targetSpawned=true; G.targetAvailableAt=Date.now(); }
+    runner.addEventListener("click",()=>Number(runner.dataset.number)===G.target?gameCorrectRunner(runner):gameWrongRunner(runner));
+    lane.appendChild(runner);
+
+    /* Desplazamiento por transform (GPU): evita el temblor que producía animar `left`. */
+    const trampoline=lane.querySelector(".game-trampoline");
+    const startLeft=-84;
+    const endLeft=(trampoline?.offsetLeft ?? Math.max(0,lane.clientWidth-246))+11;
+    const travelX=Math.max(120,endLeft-startLeft);
+    runner.style.setProperty("--travel-x",`${travelX}px`);
+
+    if(matchMedia("(prefers-reduced-motion: reduce)").matches){
+      runner.style.animation="none";
+      runner.style.transform="none";
+      runner.style.left=options.animationLeadMs ? "12%" : "2%";
+      runner._travelTimer=setTimeout(()=>gameRunnerReached(runner),Math.max(500,duration-(options.animationLeadMs||0)));
+    }else{
+      const walkEnd=e=>{ if(e.target===runner&&e.animationName==="gameWalk"){ runner.removeEventListener("animationend",walkEnd); gameRunnerReached(runner); } };
+      runner.addEventListener("animationend",walkEnd);
+    }
+    return {runner,laneIndex,speedFactor,number:n};
+  }
+  function scheduleGameSpawn(delay=null){
+    clearTimeout(G.spawnTimer);
+    if(!G.running||G.paused) return;
+    const base=GAME_SPEEDS[G.speed].spawn;
+    const d=delay ?? Math.round(base*(.72+Math.random()*.45));
+    G.spawnRemaining=d;
+    G.spawnDue=Date.now()+d;
+    G.spawnTimer=setTimeout(()=>{
+      if(!G.running||G.paused) return;
+
+      const makePair=Math.random()<0.28;
+      const first=spawnGameRunner(makePair ? {animationLeadMs:rnd(430,560)} : {});
+
+      if(first && makePair){
+        const firstFactor=first.speedFactor;
+        const secondFactor = firstFactor < 1
+          ? 1.16 + Math.random()*.16
+          : .68 + Math.random()*.16;
+        const pairDelay=rnd(250,350);
+
+        /* Pareja real: el segundo no pasa por el filtro normal de separación.
+           Sale por el mismo camino muy poco después, pero con otra velocidad. */
+        G.pairPending=setTimeout(()=>{
+          G.pairPending=null;
+          if(!G.running||G.paused) return;
+          spawnGameRunner({
+            preferredLane:first.laneIndex,
+            forcePreferred:true,
+            speedFactor:secondFactor,
+            avoidNumber:first.number
+          });
+        },pairDelay);
+
+        scheduleGameSpawn(Math.round(base*(.95+Math.random()*.35)));
+      }else{
+        scheduleGameSpawn(first ? null : 150);
+      }
+    },d);
+  }
+  function setupGameIdle(){ stopGame(false); G.phase="idle"; G.score=0; G.max=state.max; G.startMax=state.max; G.history=[]; G.levelUps=0; G.target=null; G.previousTarget=null; G.runnerSeq=0; G.pairPending=null; renderGameLanes(); updateGameHud(); updateGameControls(); gameSetPromptText(gmsg("ready")); gameFeedback(""); }
+  function startGame(){ stopGame(true); G.phase="running"; G.running=true; G.paused=false; G.score=0; G.max=state.max; G.startMax=state.max; G.history=[]; G.levelUps=0; G.target=null; G.previousTarget=null; G.targetSpawned=false; G.targetAvailableAt=0; G.wrongThisRound=0; G.runnerSeq=0; G.pairPending=null; renderGameLanes(); updateGameHud(); updateGameControls(); say(gmsg("startSpeech"),gmsg("startSpeech")); gamePromptNext(); scheduleGameSpawn(350); }
+  function pauseGame(){ if(G.phase!=="running"&&G.phase!=="paused") return; if(!G.paused){ G.paused=true; G.running=false; G.phase="paused"; G.pauseStarted=Date.now(); const now=Date.now(); if(G.spawnTimer){ G.spawnRemaining=Math.max(0,G.spawnDue-now); clearTimeout(G.spawnTimer); G.spawnTimer=null; } if(G.nextTargetTimer){ G.nextTargetRemaining=Math.max(0,G.nextTargetDue-now); clearTimeout(G.nextTargetTimer); G.nextTargetTimer=null; } $("gameScene").classList.add("paused"); cancelSpeech(); gameFeedback(gmsg("paused")); } else { const pausedFor=Date.now()-G.pauseStarted; if(G.targetAvailableAt) G.targetAvailableAt+=pausedFor; G.paused=false; G.running=true; G.phase="running"; $("gameScene").classList.remove("paused"); if(G.spawnRemaining) scheduleGameSpawn(G.spawnRemaining); else scheduleGameSpawn(); if(G.target==null) gameScheduleNextPrompt(220); else if(G.nextTargetRemaining){ G.nextTargetDue=Date.now()+G.nextTargetRemaining; G.nextTargetTimer=setTimeout(gamePromptNext,G.nextTargetRemaining); } if(G.target!=null) say(t("gameFindSpeech",{word:numberToWords(G.target)}),t("gameFindSpeech",{word:numberToWords(G.target)})); } updateGameControls(); }
+  function endGame(){ if(G.phase==="idle"||G.phase==="ended") return; stopGame(); G.phase="ended"; const msg=gmsg("ended",{score:G.score}); gameSetPromptText(msg); gameFeedback(msg,G.score>0?"good":""); say(msg,msg); gameBurst(G.score>=10?"🎉":"👏",$("gameScene")); updateGameControls(); }
+  $("gameSpeed").querySelectorAll("[data-game-speed]").forEach(btn=>btn.addEventListener("click",()=>{ G.speed=btn.dataset.gameSpeed; G.history=[]; updateGameHud(); if(state.mode==="game"&&(G.phase==="idle"||G.phase==="ended")) setupGameIdle(); }));
+  $("gameDifficulty").querySelectorAll("[data-game-difficulty]").forEach(btn=>btn.addEventListener("click",()=>{ G.difficulty=btn.dataset.gameDifficulty; if(state.mode==="game"&&G.phase!=="running"&&G.phase!=="paused") setupGameIdle(); updateGameHud(); }));
+  $("gameStart").addEventListener("click",startGame);
+  $("gamePause").addEventListener("click",pauseGame);
+  $("gameEnd").addEventListener("click",endGame);
+
+  function applyStaticTranslations(){
+    document.title = t("docTitle");
+    document.documentElement.lang = LANG_INFO[state.lang]?.html || "es";
+    document.querySelectorAll("[data-i18n]").forEach(node => {
+      node.textContent = t(node.dataset.i18n);
+    });
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(node => {
+      node.placeholder = t(node.dataset.i18nPlaceholder);
+    });
+    document.querySelectorAll("[data-i18n-aria]").forEach(node => {
+      node.setAttribute("aria-label",t(node.dataset.i18nAria));
+    });
+    document.querySelectorAll("[data-i18n-title]").forEach(node => {
+      node.title = t(node.dataset.i18nTitle);
+    });
+    el.stepPicks.querySelectorAll("[data-step]").forEach(btn => {
+      btn.textContent = t("step",{n:btn.dataset.step});
+    });
+    el.soundBtn.textContent = state.sound ? t("soundOn") : t("soundOff");
+    document.querySelectorAll("[data-lang]").forEach(btn => {
+      btn.setAttribute("aria-pressed",btn.dataset.lang===state.lang ? "true" : "false");
+    });
+  }
+
+  function applyLanguage(lang,restart=true){
+    if(!LANG_INFO[lang]) lang="es";
+    stopAllSequences();
+    clearTimeout(T);
+    state.lang = lang;
+    try{ localStorage.setItem("numbersLang06",lang); }catch(e){}
+    applyStaticTranslations();
+
+    el.numberWord.textContent = numberToWords(state.number);
+    el.decomposition.textContent = describe(state.number);
+    renderRepresentation();
+    renderSkipSequence();
+    updateGuessSettings();
+
+    if(restart){
+      if(state.mode==="explore"){
+        setNumber(state.number,false);
+        say(t("exploreSay"),"");
+      }else if(state.mode==="skip"){
+        renderSkipSequence();
+        say(t("skipSay"),"");
+      }else{
+        selectMode(state.mode);
+      }
+    }
+  }
+
+  document.querySelectorAll("[data-lang]").forEach(btn => {
+    btn.addEventListener("click",() => applyLanguage(btn.dataset.lang,true));
+  });
+
+  MODES.slice(2).forEach(m => $(m+"Tab").addEventListener("click",() => selectMode(m)));
+  $("rodsViewBtn").addEventListener("click",() => setView("rods"));
+  $("sayAgain").addEventListener("click",() => { if(lastSp) speakOnce(lastSp); });
+
+  $("bHideCount").addEventListener("change",drawB);
+
+  $("resetStarsBtn").addEventListener("click",() => {
+    if(!confirm(t("resetConfirm"))) return;
+    stars = 0;
+    showStars();
+    try{ localStorage.setItem("stars04","0"); }catch(e){}
+    say(t("resetDone"),"");
+  });
+
+  updateGuessSettings();
+  showStars();
+
+  try{
+    const savedLang = localStorage.getItem("numbersLang06");
+    if(savedLang && LANG_INFO[savedLang]) state.lang = savedLang;
+  }catch(e){}
+  applyLanguage(state.lang,false);
+  setMax(10);
+  renderSkipSequence();
+  say(t("hello"),"");
+})();
+</script>
+</body>
+</html>
